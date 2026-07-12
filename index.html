@@ -966,6 +966,12 @@ tr.opt-row .mat-cell .mf{opacity:.85}
 /* 주말 열 — 조율 대상이 아님을 톤으로 구분 */
 /* 주말 = 비활성이 아니라 톤만 다른 시간 영역 — 클릭·일정·내 기준 표시 전부 동작. 흐림은 과거 날짜(dim)에만 */
 .wk-dh.we .wk-dn{color:var(--cat-rose-fg)}
+/* 공휴일 — 날짜·요일 빨간 표기 + 공휴일명. 회의는 잡히지 않는 날 */
+.wk-dh.hol .wk-dn,.wk-dh.hol .wk-dd{color:var(--danger)}
+.wk-hname{font-size:9px;font-weight:750;color:var(--danger);line-height:1;margin-top:1px}
+.mday.hol .mday-dn,.mday.hol .mday-dd{color:var(--danger)}
+.mcal-cell.hol .mcal-dn{color:var(--danger)}
+.mcal-hname{margin-left:5px;font-size:9.5px;font-weight:750;color:var(--danger)}
 .wk-col.we{background:rgba(242,244,246,.45)}
 .wk-dh.dim{background:rgba(247,248,250,.72)}
 .wk-dh.dim .wk-dn,.wk-dh.dim .wk-dd{color:var(--faintest);opacity:.55}
@@ -1424,10 +1430,12 @@ textarea.f-line{resize:vertical;min-height:86px;line-height:1.5}
 .notif-time{display:block;margin-top:2px;font-size:10.5px;color:var(--faintest);font-weight:600}
 .notif-empty{padding:24px 16px;text-align:center;font-size:11.5px;color:var(--faint)}
 /* ── 온보딩 투어(코치마크) — 스포트라이트 구멍 + 말풍선. z-index 80 = 최상위 ── */
-.tour-blk{position:fixed;z-index:80;background:rgba(15,23,42,.55)}
-.tour-cover{position:fixed;z-index:81;background:transparent}
-.tour-hole{position:fixed;z-index:81;border-radius:12px;pointer-events:none;border:2px solid rgba(255,255,255,.95);box-shadow:0 0 0 4px rgba(47,111,237,.35);transition:all .25s ease}
-.tour-hole.live{box-shadow:0 0 0 4px rgba(47,111,237,.55),0 0 18px rgba(47,111,237,.45)}
+.tour-blk{position:fixed;z-index:80;background:rgba(15,23,42,.58)}
+.tour-cover{position:fixed;z-index:82;background:transparent}
+.tour-preview{position:fixed;z-index:81;pointer-events:none;overflow:hidden;isolation:isolate}
+.tour-preview>*{position:relative!important;inset:auto!important;width:100%!important;height:100%!important;min-width:0!important;margin:0!important;transform:none!important;opacity:1!important}
+.tour-hole{position:fixed;z-index:83;border-radius:10px;pointer-events:none;border:2px solid rgba(255,255,255,.98);box-shadow:0 0 0 4px rgba(47,111,237,.38);transition:all .2s ease}
+.tour-hole.live{box-shadow:0 0 0 4px rgba(47,111,237,.55),0 0 20px rgba(47,111,237,.38)}
 .hub-row{width:100%;display:flex;align-items:center;gap:12px;text-align:left;padding:13px 6px;border-bottom:1px solid var(--line2);cursor:pointer}
 .hub-row:last-child{border-bottom:none}
 .hub-row:hover{background:var(--panel2)}
@@ -1436,12 +1444,20 @@ textarea.f-line{resize:vertical;min-height:86px;line-height:1.5}
 .hub-tx span{font-size:11px;font-weight:550;color:var(--faint)}
 .hub-n{flex:none;font-size:10px;font-weight:700;color:var(--blue-d);background:var(--blue-s);border-radius:4px;padding:2px 7px}
 .hub-sub{font-size:11.5px;font-weight:600;color:var(--blue-d);background:var(--blue-s);border-radius:7px;padding:9px 12px;margin-bottom:8px}
-.tour-tip{position:fixed;z-index:82;width:340px;max-width:calc(100vw - 24px);background:var(--panel);border:1px solid var(--line);border-radius:11px;box-shadow:0 16px 40px rgba(15,23,42,.28);padding:16px 18px}
-.tour-step{font-size:10.5px;font-weight:800;color:var(--blue-d);margin-bottom:6px}
-.tour-title{font-size:15px;font-weight:800;color:var(--ink);line-height:1.35;margin-bottom:6px}
-.tour-body{font-size:12.5px;font-weight:500;color:var(--strong);line-height:1.65}
-.tour-acts{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px}
-.tour-acts .link-btn{color:var(--faint)}
+.tour-tip{position:fixed;z-index:84;width:360px;max-width:calc(100vw - 24px);max-height:calc(100vh - 24px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:11px;box-shadow:0 16px 40px rgba(15,23,42,.28);padding:16px 18px;outline:none}
+.tour-progress{height:3px;margin:-1px 0 12px;border-radius:99px;background:var(--line2);overflow:hidden}
+.tour-progress i{display:block;height:100%;border-radius:inherit;background:var(--blue);transition:width .2s ease}
+.tour-step{font-size:10.5px;font-weight:800;color:var(--blue-d);margin-bottom:7px;line-height:1.35}
+.tour-title{font-size:15px;font-weight:800;color:var(--ink);line-height:1.4;margin-bottom:7px}
+.tour-body{font-size:12px;font-weight:500;color:var(--strong);line-height:1.6;word-break:keep-all}
+.tour-missing{display:block;margin-top:8px;padding-top:8px;border-top:1px solid var(--line2);font-size:10.5px;color:var(--faint)}
+.tour-acts{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px}
+.tour-acts>.link-btn{flex:none;color:var(--faint);font-size:11px}
+.tour-nav{display:flex;align-items:center;gap:7px;margin-left:auto}
+.tour-prev{height:32px;padding:0 12px;border:1px solid var(--line);border-radius:6px;background:#fff;font-size:11px;font-weight:750;color:var(--strong)}
+.tour-prev:hover:not([disabled]){background:var(--panel2)}
+.tour-prev[disabled]{color:var(--faintest);background:var(--panel2);cursor:default}
+@media(max-width:640px){.tour-tip{width:calc(100vw - 24px);padding:15px 16px}.tour-body{font-size:11.5px}.tour-acts{align-items:flex-end}.tour-nav{gap:5px}}
 /* ── 도움말(?) 모달 — 질문/답 형식, 설명문이 허용되는 유일한 공간(§8) ── */
 .hp-sec{padding:12px 0;border-top:1px solid var(--line2)}
 .hp-sec:first-child{padding-top:2px;border-top:none}
@@ -2211,7 +2227,7 @@ button:focus-visible{outline:2px solid var(--blue-l);outline-offset:1px}
         <button class="tb-tab" data-nav-view="records">회의 기록</button>
       </nav>
       <span class="tb-divider"></span>
-      <button class="tb-icon" id="tbHelp" aria-label="온보딩" title="온보딩 — 화면 안내와 시나리오 가이드">
+      <button class="tb-icon" id="tbHelp" aria-label="사용 안내" title="ON AIR 사용 안내">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.1 9a3 3 0 0 1 5.83 1c0 2-3 2.6-3 2.6"/><line x1="12" y1="16.6" x2="12.01" y2="16.6"/></svg>
       </button>
       <button class="tb-icon" id="tbBell" aria-label="알림" title="알림">
@@ -2274,6 +2290,9 @@ const DAYS=ED_DATES.map((d,i)=>`${DAYS_S[i]} ${DAYS_D[i]}`);
 const TODAY_IDX=ED_DATES.findIndex(d=>sameDay(d,NOW));
 const TODAY=TODAY_IDX>=0?TODAY_IDX:0;
 const isWknd=d=>d%7>=5;
+/* 공휴일 — 회의가 잡히지 않는 날(후보 엔진 하드 제외), 캘린더 날짜는 빨간 표기 */
+const HOLIDAYS={"2026-07-17":"제헌절"};
+const holidayOf=d=>HOLIDAYS[dateKey(edDate(d))]||null;
 const liveNow=()=>new Date();
 const nowMinute=()=>{const n=liveNow();return n.getHours()*60+n.getMinutes();};
 const dayIsPast=d=>{const dt=edDate(d),t=liveNow();dt.setHours(0,0,0,0);t.setHours(0,0,0,0);return dt<t;};
@@ -2408,6 +2427,21 @@ const MY_EVENTS=[
   {d:1,s:"16:00",e:"17:00",t:"치과 예약",  k:"busy",src:"manual",hard:true},
   {d:5,s:"10:00",e:"12:00",t:"테니스 레슨",k:"busy",src:"google"},
   {d:6,s:"12:00",e:"14:00",t:"가족 점심",  k:"busy",src:"manual"},
+  /* ── 다음 주(7/13–7/19) — 7/17은 제헌절이라 회의 없음 ── */
+  {d:7,s:"09:00",e:"09:30",t:"데일리 스탠드업",k:"busy",src:"onair"},
+  {d:7,s:"14:00",e:"15:00",t:"주간 스크럼",k:"busy",src:"onair"},
+  {d:7,s:"19:00",e:"20:30",t:"저녁 약속",k:"busy",src:"manual"},
+  {d:8,s:"09:00",e:"09:30",t:"데일리 스탠드업",k:"busy",src:"onair"},
+  {d:8,s:"10:30",e:"11:30",t:"온보딩 실험 리뷰",k:"busy",src:"onair"},
+  {d:8,s:"16:00",e:"17:00",t:"치과 정기검진",k:"busy",src:"manual",hard:true},
+  {d:9,s:"09:00",e:"10:00",t:"주간 회고",k:"busy",src:"onair"},
+  {d:9,s:"13:00",e:"14:00",t:"디자인 싱크",k:"busy",src:"onair"},
+  {d:9,s:"19:00",e:"20:00",t:"학원 수업",k:"busy",src:"google"},
+  {d:10,s:"09:00",e:"09:30",t:"데일리 스탠드업",k:"busy",src:"onair"},
+  {d:10,s:"14:00",e:"15:00",t:"QA 리스크 리뷰",k:"busy",src:"onair"},
+  {d:10,s:"16:00",e:"17:00",t:"월간 로드맵 리뷰",k:"busy",src:"onair"},
+  {d:12,s:"10:00",e:"12:00",t:"테니스 레슨",k:"busy",src:"google"},
+  {d:13,s:"18:00",e:"20:00",t:"가족 저녁",k:"busy",src:"manual"},
 ];
 const monthEvent=(off,day,s,e,t,src="google",hard=false)=>({id:`mo${off}_${day}_${s.replace(":","")}_${t}`,date:monthKey(off,day),s,e,t,k:"busy",src,hard,mo:off});
 const MONTH_EVENTS=[
@@ -2416,7 +2450,7 @@ const MONTH_EVENTS=[
   monthEvent(-1,27,"09:30","11:00","집중 블록","manual",true),
   monthEvent(0,15,"10:00","11:00","온보딩 실험 리뷰","onair"),
   monthEvent(0,16,"14:00","15:30","제품 워크숍","onair"),
-  monthEvent(0,17,"11:00","12:00","고객 인터뷰","onair"),
+  monthEvent(0,20,"11:00","12:00","고객 인터뷰","onair"),   /* 7/17은 제헌절 — 회의 없음 */
   monthEvent(0,21,"09:30","10:30","그로스 지표 점검","onair"),
   monthEvent(0,22,"15:00","16:00","정책 문서 검토","manual",true),
   monthEvent(0,24,"13:00","14:00","디자인 리뷰","onair"),
@@ -2493,6 +2527,20 @@ const INVITES={
     agree:0,myRole:"exec",att:"onsite",prep:"사전 아이디어 스케치",
     agendas:["온보딩 개선 아이디어 발산","다음 분기 실험 후보 정리"],
     who:[["한지우","decide"],["김서연","info"],["서현우","info"],["박민준","info"],["이하준","info"],["정수아","exec"]]},
+  growth:{title:"그로스 실험 리뷰",hostId:"정수아",origin:"결정 필요",purposes:["decide"],dur:60,
+    proposed:{d:8,h:11,s:"11:00",e:"12:00",label:fullSlotLabel(8,"11:00","12:00")},
+    alternates:[`대안 1 · ${fullDayLabel(9)} 11:00`,`대안 2 · ${fullDayLabel(10)} 10:00`],
+    format:"online",loc:"온라인",locShort:"온라인",
+    agree:1,myRole:"info",att:"remote",prep:"실험 지표 검토",
+    agendas:["7월 실험 결과 공유","확대/중단 결정"],
+    who:[["정수아","decide"],["한지우","info"],["김서연","exec"]]},
+  migration:{title:"플랫폼 마이그레이션 킥오프",hostId:"박민준",origin:"이전 회의 후속",purposes:["align","decide"],dur:60,
+    proposed:{d:10,h:10,s:"10:00",e:"11:00",label:fullSlotLabel(10,"10:00","11:00")},
+    alternates:[`대안 1 · ${fullDayLabel(10)} 15:00`],
+    format:"offline",loc:"판교 4F · 포커스룸 (가예약)",locShort:"판교 4F · 포커스룸",
+    agree:2,myRole:"exec",att:"onsite",prep:"이전 대상 목록 확인",
+    agendas:["이전 범위 합의","일정·담당 정리"],
+    who:[["박민준","decide"],["서현우","info"],["이하준","exec"]]},
 };
 const attendForFormat=(format,fallback="onsite")=>format==="online"?"remote":format==="offline"?"onsite":fallback;
 const inviteHostLabel=v=>{const c=contactOf(v.hostId);return c?nameRank(c):"주최자 미정";};
@@ -2641,6 +2689,8 @@ const EVENT_INFO={
   "하반기 채용 싱크":{who:["이하준"],r:"판교 4F · 포커스룸",p:"align",myRole:"필참",ag:["채용 현황 공유","일정 조정"]},
   "QA 리스크 리뷰":{who:["이하준","박민준"],r:"판교 4F · 포커스룸",p:"decide",myRole:"필참",ag:["릴리즈 리스크 점검","대응 방안 결정"]},
   "데이터 품질 점검":{who:["박민준"],r:"온라인",p:"align",myRole:"필참",ag:["파이프라인 오류 점검","보완 일정 합의"]},
+  "그로스 실험 리뷰":{who:["정수아","한지우"],r:"온라인",p:"decide",myRole:"필참",ag:["7월 실험 결과 공유","확대/중단 결정"]},
+  "플랫폼 마이그레이션 킥오프":{who:["박민준","서현우","이하준"],r:"판교 4F · 포커스룸",p:"align",myRole:"선택",ag:["이전 범위 합의","일정·담당 정리"]},
 };
 const infoOf=x=>EVENT_INFO[x]||null;
 /* ── 회의 기록 저장소(FLOW.md §8) — 안건별 기록: 각자 다르게 남는 기억을 하나의 결론으로 맞추는 산출물 ── */
@@ -2898,6 +2948,7 @@ const hasSup=()=>approvalPpl().length>0;
    내부 값은 "추천 순위" 계산에만 쓰고, 캘린더 표면에는 의미 라벨로만 노출한다 */
 function evalSlot(d,h,req,opt,dur=60){
   const total=req.length+opt.length+1;             // +나
+  if(holidayOf(d)) return{d,h,feasible:false,coverage:0,total,reqCov:0,reqTot:req.length+1,penalty:99,comfortable:false,block:holidayOf(d)};
   if(iMeBusyRange(d,h,dur)) return{d,h,feasible:false,coverage:0,total,reqCov:0,reqTot:req.length+1,penalty:99,comfortable:false,block:"내 일정"};
   const feasible=req.every(p=>!busyAtRange(p,d,h,dur));      // ② 제약(하드): 필참 전원 가능해야 유효
   const all=[...req,...opt];
@@ -3310,7 +3361,7 @@ function weekColsFor(off){
     const d=new Date(base);d.setDate(base.getDate()+i);const we=i>=5;
     const ei=off*7+i;
     /* 주말도 ed 부여 — 일정·리듬·인스펙터가 7일 전체에서 동작. we는 톤 구분일 뿐 비활성이 아니다 */
-    return{ed:off>=0&&ei<RANGE_DAYS?ei:null,key:dateKey(d),lb:DOW_KR[d.getDay()],dt:`${d.getMonth()+1}/${d.getDate()}`,we,dim:d<t0&&!sameDay(d,NOW)};
+    return{ed:off>=0&&ei<RANGE_DAYS?ei:null,key:dateKey(d),lb:DOW_KR[d.getDay()],dt:`${d.getMonth()+1}/${d.getDate()}`,we,hol:HOLIDAYS[dateKey(d)]||null,dim:d<t0&&!sameDay(d,NOW)};
   });
 }
 const WEEK_COLS=weekColsFor(0);
@@ -3342,7 +3393,7 @@ function panelCenter(){
   else if(isMobile()){
     const di=st.mobDay!=null?Math.min(st.mobDay,6):(off===0?(NOW.getDay()+6)%7:0);
     const dots=i=>{const c=wkCols[i];const n=eventsForCol(c).length;return n?`<span class="mday-dot"></span>`:"";};
-    const strip=wkCols.map((c,i)=>`<button class="mday${i===di?" on":""}${c.we?" we":""}${c.dim?" dim":""}${c.ed!=null&&dayIsPast(c.ed)?" past":""}${c.ed===TODAY_IDX&&off===0?" today":""}" data-mobday="${i}"><span class="mday-dn">${c.lb}</span><span class="mday-dd">${c.dt.split("/")[1]}</span>${dots(i)}</button>`).join("");
+    const strip=wkCols.map((c,i)=>`<button class="mday${i===di?" on":""}${c.we?" we":""}${c.hol?" hol":""}${c.dim?" dim":""}${c.ed!=null&&dayIsPast(c.ed)?" past":""}${c.ed===TODAY_IDX&&off===0?" today":""}" data-mobday="${i}"><span class="mday-dn">${c.lb}</span><span class="mday-dd">${c.dt.split("/")[1]}</span>${dots(i)}</button>`).join("");
     body=`<div class="mday-strip">${strip}</div>`+weekGrid([wkCols[di]],true);
   }
   else body=weekGrid(wkCols);
@@ -3359,7 +3410,7 @@ function eventsForCol(c){
 function weekGrid(cols,noHead){
   /* 표시 범위는 07–22시(스크롤) — 근무시간 밖은 불가가 아니라 빈 시간의 우선순위 낮음으로만 드러난다. */
   const T0=CAL_START,T1=CAL_END,TH=T1-T0,HRS=Array.from({length:TH},(_,i)=>T0+i);
-  const heads=cols.map(c=>`<div class="wk-dh${c.ed===TODAY_IDX?" today":""}${c.we?" we":""}${c.dim?" dim":""}"><span class="wk-dn">${c.lb}</span><span class="wk-dd">${c.dt.split("/")[1]}</span></div>`).join("");
+  const heads=cols.map(c=>`<div class="wk-dh${c.ed===TODAY_IDX?" today":""}${c.we?" we":""}${c.hol?" hol":""}${c.dim?" dim":""}"><span class="wk-dn">${c.lb}</span><span class="wk-dd">${c.dt.split("/")[1]}</span>${c.hol?`<span class="wk-hname">${c.hol}</span>`:""}</div>`).join("");
   const gutter=HRS.map(h=>`<div class="wk-hr">${String(h).padStart(2,"0")}:00</div>`).join("");
   const colsHtml=cols.map(c=>{
     const evs=eventsForCol(c);
@@ -3431,6 +3482,7 @@ function monthPanel(off){
   const head=dow.map((d,i)=>`<div class="mcal-dow${i>=5?" we":""}">${d}</div>`).join("");
   const grid=cells.map(dt=>{
     const d=dt.getDate(),sameMonth=dt.getFullYear()===Y&&dt.getMonth()===MO;
+    const hol=HOLIDAYS[dateKey(dt)]||null;
     const dim=dt<today0&&!sameDay(dt,NOW),today=sameDay(dt,NOW),we=dt.getDay()===0||dt.getDay()===6;
     const evs=byDate[dateKey(dt)]||[];
     const chips=evs.slice(0,3).map(e=>{
@@ -3442,7 +3494,7 @@ function monthPanel(off){
       return`<div class="mcal-evt${cls}" data-ev="${eventUid(e)}"><span class="mcal-dot"></span>${e.inviteId?"응답 · ":""}${e.t}</div>`;
     }).join("");
     const more=evs.length>3?`<div class="mcal-more">+${evs.length-3} more</div>`:"";
-    return`<div class="mcal-cell${today?" today":""}${dim?" dim":""}${sameMonth?"":" outside"}${we?" we":""}" data-date="${dateKey(dt)}"><div class="mcal-dn">${d}</div><div class="mcal-evts">${chips}${more}</div></div>`;
+    return`<div class="mcal-cell${today?" today":""}${dim?" dim":""}${sameMonth?"":" outside"}${we?" we":""}${hol?" hol":""}" data-date="${dateKey(dt)}"><div class="mcal-dn">${d}${hol?`<span class="mcal-hname">${hol}</span>`:""}</div><div class="mcal-evts">${chips}${more}</div></div>`;
   }).join("");
   return`<div class="mcal"><div class="mcal-head">${head}</div><div class="mcal-grid">${grid}</div></div>`;
 }
@@ -4396,132 +4448,191 @@ function wireConsent(){
    처음 진입 시 화면 안내 자동 시작(localStorage), ? 아이콘 = 온보딩 허브(전체 목록) ── */
 const q1=s=>document.querySelector(s);
 const TOURS={
-  intro:{nm:"화면 안내",desc:"화면의 각 자리를 한 바퀴 돌아봐요",cleanup(){},steps:[
-    {sel:"#fab",title:"여기서 회의가 시작돼요",
-     body:"누르면 새 회의를 만들어요. 목적부터 정하면 참석자·시간을 차례로 안내해요."},
-    {sel:".respond-side",alt:'.stat-card[data-stat="respond"]',title:"초대엔 동의/불가만 답해요",
-     body:"받은 초대가 여기 떠요. 불가여도 사유는 묻지 않아요 — 전해지는 건 결과뿐이에요. 필참 전원이 동의하면 자동 확정돼요."},
-    {sel:".stat-strip",title:"회의 흐름이 네 칸에 모여요",
-     body:"만들고 → 답하고 → 확정되고 → 기록으로. 카드를 누르면 그 목록이 바로 열려요."},
-    {sel:".cal-legend",title:"색은 네 가지 판정이에요",
-     body:"파랑은 확정 회의, 대시는 응답 대기, 빗금은 막힌 시간, 연회색은 후순위예요. 시간 추천이 이 판정을 따라요."},
-    {sel:".criteria-toggle",title:"내 시간은 이렇게 지켜요",
-     body:"토글을 켜면 회의가 안 잡히는 내 시간이 보여요. + 버튼에서 막기/우선순위 낮추기를 골라 등록해요. 사유는 나만 봐요."},
-    {sel:'[data-nav-view="people"]',title:"사람에서 시작할 수도 있어요",
-     body:"조직도·검색으로 구성원을 찾고, 선택 후 '회의 잡기'를 누르면 바로 구성돼요."},
-    {sel:'[data-nav-view="records"]',title:"끝난 회의는 기록이 돼요",
-     body:"한 명이 안건별 결론을 정리하면 전원이 같은 기록을 봐요. 회의록은 따로 없어요."},
-    {sel:"#tbHelp",title:"언제든 다시 볼 수 있어요",
-     body:"이 물음표에서 화면 안내와 상황별 가이드를 다시 열 수 있어요."},
+  intro:{nm:"화면 안내",desc:"주요 화면과 상태를 순서대로 확인합니다",cleanup(){},steps:[
+    {sel:"#fab",title:"회의와 내 일정은 여기서 추가합니다",
+     body:"+ 버튼에서 ‘새 회의 만들기’와 ‘내 일정 추가’ 중 필요한 작업을 선택합니다."},
+    {sel:".respond-side",alt:'.stat-card[data-stat="respond"]',title:"응답이 필요한 회의를 확인합니다",
+     body:"초대에는 동의 또는 불가로 답합니다. 불가 사유와 개인 일정의 상세 내용은 상대에게 공개되지 않습니다."},
+    {sel:".stat-strip",title:"회의 상태를 네 영역에서 확인합니다",
+     body:"이번 주 회의, 응답할 초대, 생성한 회의, 정리할 회의 순으로 회의의 진행 상태가 이어집니다."},
+    {sel:".cal-legend",title:"캘린더 색의 의미를 구분합니다",
+     body:"파란색은 ON AIR 확정, 점선은 응답 필요, 빗금은 막은 시간, 회색은 우선순위가 낮은 시간입니다."},
+    {sel:".criteria-toggle",title:"회의 제외 시간을 함께 확인합니다",
+     body:"토글로 제외 시간 표시를 켜거나 끕니다. 제외 시간은 한 번만 또는 매주 반복으로 등록할 수 있습니다."},
+    {sel:'[data-nav-view="people"]',title:"구성원에서 회의를 시작합니다",
+     body:"조직도와 검색으로 구성원을 찾고 선택한 뒤 ‘회의 잡기’를 누르면 해당 인원이 참석자에 먼저 담깁니다."},
+    {sel:'[data-nav-view="records"]',title:"끝난 회의는 회의 기록에서 찾습니다",
+     body:"안건별 결론과 이월 내용을 검색하고, 필요한 기록은 즐겨찾기로 보관할 수 있습니다."},
+    {sel:"#tbHelp",title:"사용 안내를 다시 열 수 있습니다",
+     body:"상단 물음표에서 화면 안내와 상황별 가이드를 다시 확인합니다."},
   ]},
-  create:{nm:"회의 잡기",desc:"목적부터 발송 직전까지 직접 따라 해봐요",cleanup(){st.modalOpen=false;},steps:[
-    {sel:"#fab",do:()=>q1("#fab").click(),title:"+ 버튼을 눌러보세요",
-     body:"회의 만들기의 시작점이에요. 직접 누르거나, 다음을 누르면 대신 눌러드려요."},
-    {sel:"#fabMeet",do:()=>q1("#fabMeet").click(),title:"새 회의 만들기",
-     body:"시간이 아니라 '왜'부터 정해요."},
-    {sel:'[data-or="decision"]',do:()=>q1('[data-or="decision"]').click(),title:"목적 선택 — 결정 필요",
-     body:"목적이 소요 시간·참석·형식 추천의 기준이 돼요. 맞는 게 없으면 기타로 적어요."},
-    {sel:"#magenda",noLive:true,do:()=>{const t=q1("#magenda");if(t){t.value="다음 분기 로드맵 결정";t.dispatchEvent(new Event("input",{bubbles:true}));}},title:"다룰 내용 한 줄",
-     body:"입력한 내용이 안건이 되고, 첫 안건이 제목이 돼요. 다음을 누르면 예시를 넣어드려요."},
-    {sel:"#footNext",do:()=>q1("#footNext").click(),title:"참석자 단계로",
-     body:"목적과 안건이 채워지면 다음이 열려요."},
-    {sel:"#pplQ",noLive:true,do:()=>{const q=q1("#pplQ");if(!q)return;q.value="강";q.dispatchEvent(new Event("input",{bubbles:true}));q.dispatchEvent(new KeyboardEvent("keydown",{key:"Enter",bubbles:true,cancelable:true}));},title:"이름으로 검색해 담기",
-     body:"이름·팀·직급으로 찾아 담아요. 다음을 누르면 '강'을 검색해 담아드려요."},
-    {sel:"[data-grade-sel]",title:"필참 · 선택 · 공유만",
-     body:"필참만 성립 조건이에요. 선택은 가능하면 참석, 공유만은 기록만 받아요. 필참 전원 동의 = 확정."},
-    {sel:"#footNext",do:()=>q1("#footNext").click(),title:"시간 단계로",
-     body:"필참이 1명 이상이면 넘어가요."},
-    {sel:".time-cand",title:"추천안은 계산 결과예요",
-     body:"필참 전원이 가능한 시간만 후보예요. 막힌 시간은 빠지고 후순위는 뒤로 밀려요. 회의실을 고르고 '동의 요청 보내기'를 누르면 발송돼요 — 여기서 마칠게요."},
+  create:{nm:"회의 잡기",desc:"목적부터 시간 후보 확인까지 단계별로 진행합니다",cleanup(){st.modalOpen=false;},steps:[
+    {sel:"#fab",do:()=>q1("#fab")?.click(),title:"회의 추가 메뉴를 엽니다",
+     body:"강조된 + 버튼을 직접 누르거나 ‘다음’을 누르면 메뉴가 열립니다."},
+    {sel:"#fabMeet",do:()=>q1("#fabMeet")?.click(),title:"새 회의 만들기를 선택합니다",
+     body:"회의는 목적 → 참석자 → 시간 → 발송 순서로 구성합니다."},
+    {sel:'[data-or="decision"]',do:()=>q1('[data-or="decision"]')?.click(),title:"회의 목적을 선택합니다",
+     body:"목적은 회의 형식과 권장 소요 시간의 기준입니다. 해당하는 항목이 없으면 ‘기타’를 선택합니다."},
+    {sel:"#magenda",noLive:true,do:()=>{const t=q1("#magenda");if(t){t.value="다음 분기 로드맵 우선순위 결정";t.dispatchEvent(new Event("input",{bubbles:true}));}},title:"첫 안건을 구체적으로 입력합니다",
+     body:"실제로 논의하거나 결정할 내용을 한 줄로 적습니다. 회의 제목은 위 입력란에서 별도로 정합니다. ‘다음’을 누르면 예시가 입력됩니다."},
+    {sel:"#footNext",do:()=>q1("#footNext")?.click(),title:"참석자 구성으로 이동합니다",
+     body:"목적과 안건이 입력되면 다음 단계로 이동할 수 있습니다."},
+    {sel:"#pplQ",noLive:true,do:()=>{const q=q1("#pplQ");if(!q)return;q.value="강";q.dispatchEvent(new Event("input",{bubbles:true}));q.dispatchEvent(new KeyboardEvent("keydown",{key:"Enter",bubbles:true,cancelable:true}));},title:"구성원을 검색해 추가합니다",
+     body:"이름·팀·직급으로 검색합니다. ‘다음’을 누르면 ‘강’ 검색 결과의 첫 구성원을 예시로 추가합니다."},
+    {sel:"[data-grade-sel]",title:"참석 자격을 구분합니다",
+     body:"필참은 회의 성립에 반드시 필요하고, 선택은 가능한 경우 참석합니다. 공유만은 참석하지 않고 초대와 기록만 받습니다."},
+    {sel:"#footNext",do:()=>q1("#footNext")?.click(),title:"시간 후보를 계산합니다",
+     body:"필참 참석자가 한 명 이상 지정되면 가능한 시간과 회의실을 계산합니다."},
+    {sel:".time-cand",title:"추천 시간과 회의실을 확인합니다",
+     body:"필참 전원이 가능한 시간이 먼저 표시됩니다. 막은 시간은 제외되고 우선순위가 낮은 시간은 뒤로 이동합니다. 실제 초대는 보내지 않습니다."},
   ]},
-  protect:{nm:"내 시간 지키기",desc:"막을 시간과 낮출 시간을 나눠 등록해요",cleanup(){addSt.open=false;addSt.editRule=null;},steps:[
-    {sel:"#fab",do:()=>q1("#fab").click(),title:"+ 버튼을 눌러보세요",
-     body:"내 일정도 여기서 등록해요."},
-    {sel:"#fabEvent",do:()=>q1("#fabEvent").click(),title:"내 일정 추가",
-     body:"제목과 사유는 나만 봐요 — 동료에겐 결과만 전해져요."},
-    {sel:'[data-ad-h="1"]',do:()=>q1('[data-ad-h="1"]').click(),title:"막을까, 낮출까",
-     body:"막아둬요 = 회의가 절대 안 잡혀요. 우선순위만 낮춰요 = 겹치면 뒤로 밀려요. 연동된 일정은 항상 막는 시간이에요."},
-    {sel:'[data-ad-recur="weekly"]',do:()=>q1('[data-ad-recur="weekly"]').click(),title:"매주 반복",
-     body:"반복되는 시간은 한 번만 설정해요."},
-    {sel:"#adBg .pf",noLive:true,do:()=>{addSt.open=false;addSt.editRule=null;},title:"반복 일정 관리",
-     body:"만든 규칙의 수정·삭제도 여기서 해요. 막음/후순위 배지가 그 시간의 판정이에요."},
-    {sel:".cal-legend",title:"캘린더에 그대로 보여요",
-     body:"막음은 빗금, 낮춤은 연회색 — 시간 추천이 그대로 따라요."},
+  protect:{nm:"내 시간 지키기",desc:"막은 시간과 우선순위가 낮은 시간을 구분해 등록합니다",cleanup(){addSt.open=false;addSt.editRule=null;},steps:[
+    {sel:"#fab",do:()=>q1("#fab")?.click(),title:"일정 추가 메뉴를 엽니다",
+     body:"강조된 + 버튼에서 회의뿐 아니라 내 일정도 추가할 수 있습니다."},
+    {sel:"#fabEvent",do:()=>q1("#fabEvent")?.click(),title:"내 일정 추가를 선택합니다",
+     body:"일정 제목은 다른 구성원에게 공개되지 않고, 상대에게는 이 시간의 가능 여부만 반영됩니다."},
+    {sel:'[data-ad-h="1"]',do:()=>q1('[data-ad-h="1"]')?.click(),title:"회의에 미치는 영향을 선택합니다",
+     body:"‘막아둬요’는 후보에서 제외하고, ‘우선순위만 낮춰요’는 뒤에 배치합니다. 캘린더 연동 일정은 항상 막은 시간입니다."},
+    {sel:'[data-ad-recur="weekly"]',do:()=>q1('[data-ad-recur="weekly"]')?.click(),title:"반복 여부를 선택합니다",
+     body:"한 번만 적용할 일정과 매주 반복할 시간을 구분해 등록합니다."},
+    {sel:"#adBg .pf",noLive:true,do:()=>{addSt.open=false;addSt.editRule=null;},title:"반복 일정을 관리합니다",
+     body:"기존 반복 일정은 이 목록에서 수정하거나 삭제합니다. 막음과 후순위 배지는 실제 시간 판정을 나타냅니다."},
+    {sel:".cal-legend",title:"설정 결과를 캘린더에서 확인합니다",
+     body:"막은 시간은 빗금, 우선순위가 낮은 시간은 회색으로 표시되며 시간 후보 계산에도 동일하게 적용됩니다."},
   ]},
-  respond:{nm:"초대에 답하기",desc:"동의/불가 두 마디면 끝나요",cleanup(){},steps:[
-    {sel:".respond-side",alt:'.stat-card[data-stat="respond"]',title:"답을 기다리는 초대예요",
-     body:"내가 답해야 상대 조율이 진행돼요. 다 답하면 패널이 사라져요."},
-    {sel:".respond-side .qcard .qbtn.pri",alt:'.stat-card[data-stat="respond"]',title:"동의/불가 — 그게 전부예요",
-     body:"불가여도 사유는 묻지 않아요. 필참 전원이 동의하면 자동 확정돼 캘린더에 올라가요."},
-    {sel:".wk-evt.lay-invite",alt:".cal-legend",title:"응답 전엔 자리만 잡아요",
-     body:"대시 카드는 아직 미확정 — 전원이 동의하면 파란 카드가 돼요."},
+  respond:{nm:"초대에 답하기",desc:"동의와 불가 응답이 회의 확정에 반영되는 과정을 확인합니다",cleanup(){},steps:[
+    {sel:".respond-side",alt:'.stat-card[data-stat="respond"]',title:"응답이 필요한 초대를 확인합니다",
+     body:"내 응답이 남아 있는 회의가 표시됩니다. 모든 초대에 답하면 좌측 응답 패널은 사라집니다."},
+    {sel:".respond-side .qcard .qbtn.pri",alt:'.stat-card[data-stat="respond"]',title:"동의 또는 불가로 답합니다",
+     body:"불가를 선택해도 사유는 요구하거나 공유하지 않습니다. 필참 참석자가 모두 동의하면 회의가 확정됩니다."},
+    {sel:".wk-evt.lay-invite",alt:".cal-legend",title:"확정 전 회의는 점선으로 표시됩니다",
+     body:"응답을 기다리는 동안에는 일정이 점선 카드로 표시되고, 확정되면 파란색 ON AIR 확정 카드로 변경됩니다."},
   ]},
-  wrap:{nm:"회의 정리",desc:"끝난 회의를 결론으로 남겨요",cleanup(){st.recWrap=null;st.recWrapItems=null;st.statList=null;st.recView=null;},steps:[
-    {sel:'.stat-card[data-stat="wrap"]',do:()=>q1('.stat-card[data-stat="wrap"]').click(),title:"정리할 회의",
-     body:"끝난 회의는 정리될 때까지 여기 남아요."},
-    {sel:'#mlBg [data-ml-act^="wraprec"]',do:()=>q1('#mlBg [data-ml-act^="wraprec"]').click(),title:"정리로 들어가기",
-     body:"행을 누르면 안건별 정리가 열려요."},
-    {sel:"[data-rw-res]",title:"안건마다 결론 한 줄",
-     body:"'결정 없음'도 결론이에요. 못 끝낸 안건은 이월로 남기면 후속 회의의 안건 후보가 돼요."},
-    {sel:"#rwSave",title:"저장하면 전원 공유",
-     body:"한 명이 정리하면 전원이 같은 기록을 봐요 — 회의록은 따로 없어요. 지금은 저장하지 않고 마칠게요."},
+  wrap:{nm:"회의 정리",desc:"끝난 회의의 결론과 이월 안건을 기록합니다",cleanup(){st.recWrap=null;st.recWrapItems=null;st.statList=null;st.recView=null;},steps:[
+    {sel:'.stat-card[data-stat="wrap"]',do:()=>q1('.stat-card[data-stat="wrap"]')?.click(),title:"정리가 필요한 회의를 확인합니다",
+     body:"종료된 회의는 안건별 정리가 완료될 때까지 이 영역에 남습니다."},
+    {sel:'#mlBg [data-ml-act^="wraprec"]',do:()=>q1('#mlBg [data-ml-act^="wraprec"]')?.click(),title:"정리할 회의를 선택합니다",
+     body:"목록의 회의를 선택하면 안건별 결론을 입력하는 화면이 열립니다."},
+    {sel:"[data-rw-res]",title:"안건마다 결론을 한 줄로 남깁니다",
+     body:"결론이 나지 않았다면 ‘결정 없음’으로 기록할 수 있습니다. 후속 논의가 필요한 안건은 이월합니다."},
+    {sel:"#rwSave",title:"저장된 내용은 참석자에게 공유됩니다",
+     body:"한 사람이 정리하면 모든 참석자가 같은 회의 기록을 확인합니다. 이 가이드에서는 실제로 저장하지 않습니다."},
   ]},
 };
-function startTour(key,auto){
-  st.tourAuto=!!auto;
+let _tourTransitioning=false,_tourTarget=null,_tourPlaceRaf=0;
+function resetTourSurface(){
   st.tourHub=false;st.view="cal";st.calView="week";st.calOff=0;st.modalOpen=false;st.statList=null;st.notif=false;
-  addSt.open=false;st.recView=null;st.recWrap=null;st.sel=null;st.slotView=null;st.invite=null;
-  st.tourKey=key||"intro";st.tour=0;render();
+  addSt.open=false;addSt.editRule=null;st.recView=null;st.recWrap=null;st.sel=null;st.slotView=null;st.invite=null;
+  const menu=q1("#fabMenu"),scrim=q1("#fabScrim"),fab=q1("#fab");
+  if(menu)menu.hidden=true;if(scrim)scrim.hidden=true;if(fab)fab.classList.remove("open");
+}
+function startTour(key,auto){
+  const prev=TOURS[st.tourKey];if(prev&&prev.cleanup)prev.cleanup();
+  st.tourAuto=!!auto;st.tourKey=key||"intro";st.tour=0;
+  resetTourSurface();render();
 }
 function endTour(){
   const t=TOURS[st.tourKey],wasIntroAuto=st.tourKey==="intro"&&st.tourAuto;
   if(st.tourKey==="intro"){try{localStorage.setItem("onairTour","done");}catch(e){}}
+  _tourTarget=null;cancelAnimationFrame(_tourPlaceRaf);
   st.tourKey=null;st.tour=null;st.tourAuto=false;
   if(t&&t.cleanup)t.cleanup();
   /* 첫 진입의 화면 안내가 끝나면 허브를 열어 나머지 가이드로 잇는다 */
   if(wasIntroAuto){st.tourHub=true;st.tourHubNext=true;}
   render();
 }
+function runTourAction(step){
+  if(!step||!step.do)return;
+  const was=_tourTransitioning;_tourTransitioning=true;
+  try{step.do();}catch(e){console.warn("[ON AIR onboarding] step action failed",e);}
+  finally{_tourTransitioning=was;}
+}
+/* 이전 단계는 숫자만 줄이면 이미 열린 모달·선택 상태와 대상이 어긋난다.
+   가이드를 초기 화면으로 되돌린 뒤 목표 단계 직전의 동작만 재생해 정확한 화면을 복원한다. */
+function rebuildTourTo(target){
+  const key=st.tourKey,tour=TOURS[key];if(!tour)return;
+  const to=Math.max(0,Math.min(target,tour.steps.length-1));
+  _tourTransitioning=true;
+  try{
+    if(tour.cleanup)tour.cleanup();
+    resetTourSurface();st.tour=0;render();
+    for(let i=0;i<to;i++){st.tour=i;runTourAction(tour.steps[i]);}
+    st.tour=to;
+  }finally{_tourTransitioning=false;}
+  render();
+}
+function tourElementVisible(el){
+  if(!el)return false;
+  const r=el.getBoundingClientRect(),cs=getComputedStyle(el);
+  return r.width>1&&r.height>1&&cs.display!=="none"&&cs.visibility!=="hidden"&&parseFloat(cs.opacity||"1")>0;
+}
+function currentTourTarget(step){
+  const main=document.querySelector(step.sel);if(tourElementVisible(main))return{el:main,alt:false};
+  const alt=step.alt?document.querySelector(step.alt):null;if(tourElementVisible(alt))return{el:alt,alt:true};
+  const fallback=document.querySelector("#tbHelp")||document.querySelector(".page-head");
+  return{el:fallback,alt:true,missing:true};
+}
 function renderTour(){
   const layer=document.getElementById("tourlayer");if(!layer)return;
   if(!st.tourKey){layer.innerHTML="";return;}
+  if(_tourTransitioning){layer.innerHTML="";return;}
   const tour=TOURS[st.tourKey],steps=tour.steps;
-  /* 대상이 없는 스텝은 대체 셀렉터 → 그래도 없으면 건너뛴다. 가시성은 rect로(fixed 요소는 offsetParent가 null) */
-  let i=st.tour,step=null,el=null;
-  while(i<steps.length){
-    step=steps[i];
-    el=document.querySelector(step.sel)||(step.alt?document.querySelector(step.alt):null);
-    if(el&&el.getClientRects().length)break;
-    i++;
-  }
-  if(i>=steps.length){endTour();return;}
-  st.tour=i;
-  const last=i===steps.length-1,live=!!step.do&&!step.noLive;
+  const i=Math.max(0,Math.min(st.tour||0,steps.length-1)),step=steps[i],target=currentTourTarget(step),el=target.el;
+  st.tour=i;_tourTarget=el;
+  const last=i===steps.length-1,live=!!step.do&&!step.noLive&&!target.missing;
+  const body=step.body+(target.missing?`<span class="tour-missing">현재 화면에 대상 항목이 없어 설명만 표시합니다.</span>`:"");
   layer.innerHTML=`
     ${["t","b","l","r"].map(k=>`<div class="tour-blk" data-tb="${k}"></div>`).join("")}
     ${live?"":`<div class="tour-cover" id="tourCover"></div>`}
+    <div class="tour-preview" id="tourPreview" aria-hidden="true"></div>
     <div class="tour-hole${live?" live":""}" id="tourHole"></div>
-    <div class="tour-tip" id="tourTip" role="dialog" aria-label="온보딩 안내">
-      <div class="tour-step">${tour.nm} · ${i+1} / ${steps.length}</div>
+    <div class="tour-tip" id="tourTip" role="dialog" aria-label="${tour.nm} 온보딩" aria-live="polite" tabindex="-1">
+      <div class="tour-progress" role="progressbar" aria-label="진행률" aria-valuemin="1" aria-valuemax="${steps.length}" aria-valuenow="${i+1}"><i style="width:${((i+1)/steps.length)*100}%"></i></div>
+      <div class="tour-step">${tour.nm} · ${i+1}/${steps.length}</div>
       <div class="tour-title">${step.title}</div>
-      <div class="tour-body">${step.body}</div>
-      <div class="tour-acts"><button class="link-btn" id="tourSkip">건너뛰기</button><span class="ma-sp"></span><button class="btn btn-p btn-sm" id="tourNext">${last?"완료":"다음"}</button></div>
+      <div class="tour-body">${body}</div>
+      <div class="tour-acts"><button class="link-btn" id="tourSkip">${st.tourAuto?"건너뛰기":"가이드 종료"}</button><div class="tour-nav"><button class="tour-prev" id="tourPrev"${i===0?" disabled":""}>이전</button><button class="btn btn-p btn-sm" id="tourNext">${last?"완료":"다음"}</button></div></div>
     </div>`;
   placeTour(el);
   document.getElementById("tourSkip").onclick=endTour;
+  document.getElementById("tourPrev").onclick=()=>{if(i>0)rebuildTourTo(i-1);};
   document.getElementById("tourNext").onclick=()=>{
-    if(st.tour>=steps.length-1){endTour();return;}
-    const cur=steps[st.tour],idx=st.tour;
-    if(cur.do){try{cur.do();}catch(e){}}
-    /* do가 앱 렌더를 유발하면 renderTour의 자동 스킵이 이미 전진시켰을 수 있다 — 이중 전진 방지 */
-    if(st.tourKey&&st.tour===idx){st.tour++;render();}
+    if(i>=steps.length-1){endTour();return;}
+    runTourAction(step);
+    if(st.tourKey){st.tour=i+1;render();}
   };
+  const tip=document.getElementById("tourTip");
+  tip.onkeydown=e=>{
+    if(e.key==="Escape"){e.preventDefault();endTour();}
+    else if(e.key==="ArrowLeft"&&i>0){e.preventDefault();rebuildTourTo(i-1);}
+    else if(e.key==="ArrowRight"){e.preventDefault();document.getElementById("tourNext")?.click();}
+  };
+  requestAnimationFrame(()=>{if(st.tourKey&&_tourTarget===el){ensureTourTargetVisible(el);placeTour(el);tip.focus({preventScroll:true});}});
+}
+function ensureTourTargetVisible(el){
+  if(!tourElementVisible(el))return;
+  const r=el.getBoundingClientRect(),vh=innerHeight,vw=innerWidth;
+  const fixed=getComputedStyle(el).position==="fixed"||!!el.closest(".topbar,.fab,.fab-menu");
+  const clipped=r.top<20||r.bottom>vh-20||r.left<20||r.right>vw-20;
+  if(!fixed&&clipped&&r.height<vh-40&&r.width<vw-40)el.scrollIntoView({block:"center",inline:"nearest",behavior:"auto"});
+}
+function cloneTourTarget(el,preview,r){
+  if(!preview||!el)return;
+  const clone=el.cloneNode(true),originalFields=[el,...el.querySelectorAll("input,textarea,select")],cloneFields=[clone,...clone.querySelectorAll("input,textarea,select")];
+  clone.removeAttribute("id");clone.querySelectorAll("[id]").forEach(n=>n.removeAttribute("id"));clone.removeAttribute("hidden");
+  originalFields.forEach((o,i)=>{const c=cloneFields[i];if(!c)return;if("value" in o)c.value=o.value;if("checked" in o)c.checked=o.checked;});
+  clone.style.pointerEvents="none";clone.style.width="100%";clone.style.height="100%";
+  preview.replaceChildren(clone);
+  preview.style.left=r.left+"px";preview.style.top=r.top+"px";preview.style.width=r.width+"px";preview.style.height=r.height+"px";
+  preview.style.borderRadius=getComputedStyle(el).borderRadius;
 }
 function placeTour(el){
   const hole=document.getElementById("tourHole"),tip=document.getElementById("tourTip");
-  if(!el||!hole||!tip)return;
+  const preview=document.getElementById("tourPreview");
+  if(!tourElementVisible(el)||!hole||!tip||!preview)return;
   const r=el.getBoundingClientRect(),pad=6,vw=window.innerWidth,vh=window.innerHeight;
-  const hx=r.left-pad,hy=r.top-pad,hw=r.width+pad*2,hh2=r.height+pad*2;
+  cloneTourTarget(el,preview,r);
+  const hx=Math.max(4,r.left-pad),hy=Math.max(4,r.top-pad),hr=Math.min(vw-4,r.right+pad),hb=Math.min(vh-4,r.bottom+pad),hw=Math.max(0,hr-hx),hh2=Math.max(0,hb-hy);
   hole.style.left=hx+"px";hole.style.top=hy+"px";hole.style.width=hw+"px";hole.style.height=hh2+"px";
   const cover=document.getElementById("tourCover");
   if(cover){cover.style.left=hx+"px";cover.style.top=hy+"px";cover.style.width=hw+"px";cover.style.height=hh2+"px";}
@@ -4533,19 +4644,41 @@ function placeTour(el){
   if(L){L.style.cssText+=`;left:0;top:${hy}px;width:${Math.max(0,hx)}px;height:${hh2}px`;}
   if(R){R.style.cssText+=`;left:${hx+hw}px;top:${hy}px;width:${Math.max(0,vw-hx-hw)}px;height:${hh2}px`;}
   const tw=tip.offsetWidth,thh=tip.offsetHeight;
-  let x=Math.min(Math.max(12,r.left),vw-tw-12);
-  let y=r.bottom+pad+12;
-  if(y+thh>vh-12)y=Math.max(12,r.top-pad-thh-12);
-  tip.style.left=x+"px";tip.style.top=y+"px";
+  const gap=16,clampX=x=>Math.min(Math.max(12,x),vw-tw-12),clampY=y=>Math.min(Math.max(12,y),vh-thh-12);
+  const candidates=[
+    {x:clampX(r.left),y:r.bottom+gap},
+    {x:clampX(r.left),y:r.top-thh-gap},
+    {x:r.right+gap,y:clampY(r.top)},
+    {x:r.left-tw-gap,y:clampY(r.top)}
+  ];
+  const fits=p=>p.x>=12&&p.y>=12&&p.x+tw<=vw-12&&p.y+thh<=vh-12;
+  const p=candidates.find(fits)||{x:clampX(r.left),y:clampY(r.bottom+gap)};
+  tip.style.left=p.x+"px";tip.style.top=p.y+"px";
 }
+function scheduleTourPlacement(){
+  cancelAnimationFrame(_tourPlaceRaf);_tourPlaceRaf=requestAnimationFrame(()=>{
+    if(!st.tourKey)return;const step=TOURS[st.tourKey]?.steps[st.tour];if(!step)return;
+    const target=currentTourTarget(step).el;if(target){_tourTarget=target;placeTour(target);}
+  });
+}
+window.addEventListener("resize",scheduleTourPlacement);
+document.addEventListener("scroll",scheduleTourPlacement,true);
 /* 시나리오 스텝의 대상 요소를 직접 누르면 — 앱이 실제로 반응하고, 투어는 그 결과 위에서 다음 스텝으로 */
 document.addEventListener("click",e=>{
-  if(!st.tourKey)return;
+  if(!st.tourKey||_tourTransitioning)return;
   const tour=TOURS[st.tourKey],step=tour&&tour.steps[st.tour];
   if(!step||!step.do||step.noLive)return;
-  const el=document.querySelector(step.sel)||(step.alt?document.querySelector(step.alt):null);
+  const el=currentTourTarget(step).el;
   const idx=st.tour;
-  if(el&&(el===e.target||el.contains(e.target)))setTimeout(()=>{if(st.tourKey&&st.tour===idx){st.tour++;render();}},150);
+  if(el&&(el===e.target||el.contains(e.target))){
+    _tourTransitioning=true;
+    setTimeout(()=>{
+      const advance=st.tourKey&&st.tour===idx;
+      if(advance)st.tour++;
+      _tourTransitioning=false;
+      if(st.tourKey)render();
+    },120);
+  }
 },true);
 /* ── 온보딩 허브(?) — 화면 안내 + 시나리오 가이드 목록 ── */
 function tourHubModal(){
@@ -4553,8 +4686,8 @@ function tourHubModal(){
       <span class="hub-tx"><b>${t.nm}</b><span>${t.desc}</span></span>
       <span class="hub-n">${t.steps.length}단계</span>
       <svg class="ml-go" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></button>`;};
-  const sub=st.tourHubNext?`<div class="hub-sub">화면 안내를 마쳤어요 — 상황별 가이드도 확인해 보세요.</div>`:"";
-  return`<div class="modal-bg" id="hubBg"><div class="modal-wrap" style="max-width:460px"><div class="modal-bar"><h2>온보딩</h2><button class="modal-close" id="hubClose">×</button></div><div class="mc"><div class="mc-h"><h3>ON AIR 배우기</h3></div><div class="mc-b" style="padding-top:4px">${sub}
+  const sub=st.tourHubNext?`<div class="hub-sub">화면 안내가 완료되었습니다. 필요한 작업별 가이드를 선택하세요.</div>`:"";
+  return`<div class="modal-bg" id="hubBg"><div class="modal-wrap" style="max-width:460px"><div class="modal-bar"><h2>사용 안내</h2><button class="modal-close" id="hubClose">×</button></div><div class="mc"><div class="mc-h"><h3>ON AIR 가이드</h3></div><div class="mc-b" style="padding-top:4px">${sub}
     ${["intro","create","protect","respond","wrap"].map(row).join("")}
   </div></div></div></div>`;
 }
