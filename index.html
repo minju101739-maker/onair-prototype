@@ -1021,9 +1021,9 @@ tr.opt-row .mat-cell .mf{opacity:.85}
 .wk-evt.lay-soft .wk-evt-t{color:var(--ink)}
 .wk-evt.lay-soft .wk-evt-s{opacity:.75}
 /* 30분 카드 = 실제 절반 높이. 한 줄(제목·시간)로 눕히고 장소·안건은 숨긴다 — 09:30 회의와 10:00 회의가 같은 크기면 안 된다 */
-.wk-evt.sm{flex-direction:row;align-items:center;gap:6px;padding:2px 9px}
-.wk-evt.sm .wk-evt-s{font-size:10.5px;white-space:nowrap;flex:none}
-.wk-evt.sm .wk-evt-t{font-size:12px;min-width:0;flex:1}
+.wk-evt.sm{flex-direction:row;align-items:center;gap:5px;padding:2px 8px}
+.wk-evt.sm .wk-evt-t{font-size:12px;min-width:0;flex:0 1 auto}
+.wk-evt.sm .wk-evt-s{font-size:10px;white-space:nowrap;flex:none}
 /* 카드 높이가 모자라면 제목이 flex-shrink로 짜부라져 잘린다 — 줄들은 고정 높이, 넘치면 아래(안건)부터 숨김 */
 .wk-evt-t,.wk-evt-s,.wk-evt-meta,.wk-evt-ag{flex:none}
 .wk-evt-ags{margin-top:3px;padding-top:4px;border-top:1px solid rgba(255,255,255,.28);display:flex;flex-direction:column;gap:1px;min-height:0;overflow:hidden}
@@ -1437,6 +1437,7 @@ textarea.f-line{resize:vertical;min-height:86px;line-height:1.5}
 .notif-empty{padding:24px 16px;text-align:center;font-size:11.5px;color:var(--faint)}
 /* ── 온보딩 투어(코치마크) — 스포트라이트 구멍 + 말풍선. z-index 80 = 최상위 ── */
 .tour-blk{position:fixed;z-index:80;background:rgba(15,23,42,.58)}
+.tour-blk.full{inset:0}
 .tour-cover{position:fixed;z-index:82;background:transparent}
 .tour-preview{position:fixed;z-index:81;pointer-events:none;overflow:hidden;isolation:isolate}
 .tour-preview>*{position:relative!important;inset:auto!important;width:100%!important;height:100%!important;min-width:0!important;margin:0!important;transform:none!important;opacity:1!important}
@@ -1456,7 +1457,6 @@ textarea.f-line{resize:vertical;min-height:86px;line-height:1.5}
 .tour-step{font-size:10.5px;font-weight:800;color:var(--blue-d);margin-bottom:7px;line-height:1.35}
 .tour-title{font-size:15px;font-weight:800;color:var(--ink);line-height:1.4;margin-bottom:7px}
 .tour-body{font-size:12px;font-weight:500;color:var(--strong);line-height:1.6;word-break:keep-all}
-.tour-missing{display:block;margin-top:8px;padding-top:8px;border-top:1px solid var(--line2);font-size:10.5px;color:var(--faint)}
 .tour-acts{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px}
 .tour-acts>.link-btn{flex:none;color:var(--faint);font-size:11px}
 .tour-nav{display:flex;align-items:center;gap:7px;margin-left:auto}
@@ -3502,8 +3502,8 @@ function weekGrid(cols,noHead){
       const agHtml=lay===" lay-onair"&&ag.length?`<div class="wk-evt-ags">${ag.map(a=>`<div class="wk-evt-ag">· ${a}</div>`).join("")}</div>`:"";
       const title=inv?`<span class="wk-inv-badge">응답</span>${e.t}`:e.t;
       const sm=(min(e.e)-min(e.s))<45;
-      /* 30분 카드 = 절반 높이 한 줄 — 시작시간·제목만(구글 캘린더 문법). 제목이 시간에 밀려 잘리지 않게 시간은 시작만 */
-      if(sm)return`<div class="wk-evt${lay} sm" data-ev="${eventUid(e)}" style="top:${top}%;height:${ht}%"><div class="wk-evt-s">${e.s}</div><div class="wk-evt-t">${title}</div></div>`;
+      /* 30분 카드 = 절반 높이 한 줄 — 제목 먼저, 그 뒤 시간 범위(00:00–00:00)까지 노출 */
+      if(sm)return`<div class="wk-evt${lay} sm" data-ev="${eventUid(e)}" style="top:${top}%;height:${ht}%"><div class="wk-evt-t">${title}</div><div class="wk-evt-s">${e.s}–${e.e}</div></div>`;
       return`<div class="wk-evt${lay}" data-ev="${eventUid(e)}" style="top:${top}%;height:${ht}%"><div class="wk-evt-t">${title}</div><div class="wk-evt-s">${e.s}–${e.e}</div>${meta}${agHtml}</div>`;
     }).join("");
     return`<div class="wk-col${c.ed===TODAY_IDX?" today":""}${c.we?" we":""}${c.dim?" dim":""}">${slots}${zones}${blocks}</div>`;
@@ -4512,78 +4512,58 @@ function wireConsent(){
    시나리오는 실제 UI를 그대로 움직인다: 스포트라이트된 요소를 직접 눌러도 되고, '다음'을 누르면 대신 실행한다(step.do).
    처음 진입 시 화면 안내 자동 시작(localStorage), ? 아이콘 = 온보딩 허브(전체 목록) ── */
 const q1=s=>document.querySelector(s);
+function openTourFabMenu(){
+  const menu=q1("#fabMenu"),scrim=q1("#fabScrim"),fab=q1("#fab");
+  if(menu)menu.hidden=false;if(scrim)scrim.hidden=false;if(fab)fab.classList.add("open");
+}
 const TOURS={
-  intro:{nm:"화면 안내",desc:"주요 화면과 상태를 순서대로 확인합니다",cleanup(){},steps:[
-    {sel:"#fab",title:"회의와 내 일정은 여기서 추가합니다",
-     body:"+ 버튼에서 ‘새 회의 만들기’와 ‘내 일정 추가’ 중 필요한 작업을 선택합니다."},
-    {sel:".respond-side",alt:'.stat-card[data-stat="respond"]',title:"응답이 필요한 회의를 확인합니다",
-     body:"초대에는 동의 또는 불가로 답합니다. 불가 사유와 개인 일정의 상세 내용은 상대에게 공개되지 않습니다."},
-    {sel:".stat-strip",title:"회의 상태를 네 영역에서 확인합니다",
-     body:"이번 주 회의, 응답할 초대, 생성한 회의, 정리할 회의 순으로 회의의 진행 상태가 이어집니다."},
-    {sel:".cal-legend",title:"캘린더 색의 의미를 구분합니다",
-     body:"파란색은 ON AIR 확정, 점선은 응답 필요, 빗금은 막은 시간, 회색은 우선순위가 낮은 시간입니다."},
-    {sel:".criteria-toggle",title:"회의 제외 시간을 함께 확인합니다",
-     body:"토글로 제외 시간 표시를 켜거나 끕니다. 제외 시간은 한 번만 또는 매주 반복으로 등록할 수 있습니다."},
-    {sel:'[data-nav-view="people"]',title:"구성원에서 회의를 시작합니다",
-     body:"조직도와 검색으로 구성원을 찾고 선택한 뒤 ‘회의 잡기’를 누르면 해당 인원이 참석자에 먼저 담깁니다."},
-    {sel:'[data-nav-view="records"]',title:"끝난 회의는 회의 기록에서 찾습니다",
-     body:"안건별 결론과 이월 내용을 검색하고, 필요한 기록은 즐겨찾기로 보관할 수 있습니다."},
-    {sel:"#tbHelp",title:"사용 안내를 다시 열 수 있습니다",
-     body:"상단 물음표에서 화면 안내와 상황별 가이드를 다시 확인합니다."},
+  intro:{nm:"화면 안내",desc:"주요 기능을 빠르게 확인합니다",cleanup(){},steps:[
+    {sel:"#fab",title:"회의와 일정 추가",body:"+ 버튼에서 원하는 작업을 선택하세요."},
+    {sel:".respond-side",alt:'.stat-card[data-stat="respond"]',title:"응답할 회의",body:"초대별로 동의 또는 불가를 선택하세요."},
+    {sel:".stat-strip",title:"회의 상태",body:"네 영역에서 진행 상태와 할 일을 확인하세요."},
+    {sel:".cal-legend",title:"캘린더 표시",body:"파랑=ON AIR 확정 · 점선=응답 필요 · 빗금=막은 시간 · 회색=후순위"},
+    {sel:".criteria-toggle",title:"회의 제외 시간",body:"토글로 제외 시간 표시를 켜고 끄세요."},
+    {sel:'[data-nav-view="people"]',title:"구성원 선택",body:"구성원을 선택하고 회의 잡기를 누르세요."},
+    {sel:'[data-nav-view="records"]',title:"회의 기록 검색",body:"결론·안건·참석자로 지난 회의를 찾으세요."},
+    {sel:"#tbHelp",title:"사용 안내",body:"물음표에서 가이드를 다시 여세요."},
   ]},
-  create:{nm:"회의 잡기",desc:"목적부터 시간 후보 확인까지 단계별로 진행합니다",cleanup(){st.modalOpen=false;},steps:[
-    {sel:"#fab",do:()=>q1("#fab")?.click(),title:"회의 추가 메뉴를 엽니다",
-     body:"강조된 + 버튼을 직접 누르거나 ‘다음’을 누르면 메뉴가 열립니다."},
-    {sel:"#fabMeet",do:()=>q1("#fabMeet")?.click(),title:"새 회의 만들기를 선택합니다",
-     body:"회의는 목적 → 참석자 → 시간 → 발송 순서로 구성합니다."},
-    {sel:'[data-or="decision"]',do:()=>q1('[data-or="decision"]')?.click(),title:"회의 목적을 선택합니다",
-     body:"목적은 회의 형식과 권장 소요 시간의 기준입니다. 해당하는 항목이 없으면 ‘기타’를 선택합니다."},
-    {sel:"#magenda",noLive:true,do:()=>{const t=q1("#magenda");if(t){t.value="다음 분기 로드맵 우선순위 결정";t.dispatchEvent(new Event("input",{bubbles:true}));}},title:"첫 안건을 구체적으로 입력합니다",
-     body:"실제로 논의하거나 결정할 내용을 한 줄로 적습니다. 회의 제목은 위 입력란에서 별도로 정합니다. ‘다음’을 누르면 예시가 입력됩니다."},
-    {sel:"#footNext",do:()=>q1("#footNext")?.click(),title:"참석자 구성으로 이동합니다",
-     body:"목적과 안건이 입력되면 다음 단계로 이동할 수 있습니다."},
-    {sel:"#pplQ",noLive:true,do:()=>{const q=q1("#pplQ");if(!q)return;q.value="강";q.dispatchEvent(new Event("input",{bubbles:true}));q.dispatchEvent(new KeyboardEvent("keydown",{key:"Enter",bubbles:true,cancelable:true}));},title:"구성원을 검색해 추가합니다",
-     body:"이름·팀·직급으로 검색합니다. ‘다음’을 누르면 ‘강’ 검색 결과의 첫 구성원을 예시로 추가합니다."},
-    {sel:"[data-grade-sel]",title:"참석 자격을 구분합니다",
-     body:"필참은 회의 성립에 반드시 필요하고, 선택은 가능한 경우 참석합니다. 공유만은 참석하지 않고 초대와 기록만 받습니다."},
-    {sel:"#footNext",do:()=>q1("#footNext")?.click(),title:"시간 후보를 계산합니다",
-     body:"필참 참석자가 한 명 이상 지정되면 가능한 시간과 회의실을 계산합니다."},
-    {sel:".time-cand",title:"추천 시간과 회의실을 확인합니다",
-     body:"필참 전원이 가능한 시간이 먼저 표시됩니다. 막은 시간은 제외되고 우선순위가 낮은 시간은 뒤로 이동합니다. 실제 초대는 보내지 않습니다."},
+  create:{nm:"회의 잡기",desc:"회의 생성 순서를 따라갑니다",cleanup(){st.modalOpen=false;},steps:[
+    {sel:"#fab",do:openTourFabMenu,title:"회의 추가 메뉴",body:"강조된 + 버튼을 누르세요."},
+    {sel:"#fabMeet",do:()=>q1("#fabMeet")?.click(),title:"새 회의 만들기",body:"새 회의 만들기를 누르세요."},
+    {sel:'[data-or="decision"]',do:()=>q1('[data-or="decision"]')?.click(),title:"회의 목적 선택",body:"결정 필요를 선택하세요."},
+    {sel:"#magenda",noLive:true,do:()=>{const t=q1("#magenda");if(t){t.value="다음 분기 로드맵 우선순위 결정";t.dispatchEvent(new Event("input",{bubbles:true}));}},title:"첫 안건 입력",body:"논의하거나 결정할 내용을 한 줄로 적으세요."},
+    {sel:"#footNext",do:()=>q1("#footNext")?.click(),title:"참석자 단계",body:"다음을 눌러 참석자를 추가하세요."},
+    {sel:"#pplQ",noLive:true,do:()=>{const q=q1("#pplQ");if(!q)return;q.value="강";q.dispatchEvent(new Event("input",{bubbles:true}));q.dispatchEvent(new KeyboardEvent("keydown",{key:"Enter",bubbles:true,cancelable:true}));},title:"구성원 검색",body:"이름·팀·직급으로 찾고 추가하세요."},
+    {sel:"[data-grade-sel]",title:"참석 자격",body:"필참·선택·공유만 중 하나를 고르세요."},
+    {sel:"#footNext",do:()=>q1("#footNext")?.click(),title:"시간 후보 계산",body:"다음을 눌러 가능한 시간을 계산하세요."},
+    {sel:".time-cand",title:"추천 시간 확인",body:"시간과 회의실을 선택하고 발송 단계로 이동하세요."},
   ]},
-  protect:{nm:"내 시간 지키기",desc:"막은 시간과 우선순위가 낮은 시간을 구분해 등록합니다",cleanup(){addSt.open=false;addSt.editRule=null;},steps:[
-    {sel:"#fab",do:()=>q1("#fab")?.click(),title:"일정 추가 메뉴를 엽니다",
-     body:"강조된 + 버튼에서 회의뿐 아니라 내 일정도 추가할 수 있습니다."},
-    {sel:"#fabEvent",do:()=>q1("#fabEvent")?.click(),title:"내 일정 추가를 선택합니다",
-     body:"일정 제목은 다른 구성원에게 공개되지 않고, 상대에게는 이 시간의 가능 여부만 반영됩니다."},
-    {sel:'[data-ad-h="1"]',do:()=>q1('[data-ad-h="1"]')?.click(),title:"회의에 미치는 영향을 선택합니다",
-     body:"‘막아둬요’는 후보에서 제외하고, ‘우선순위만 낮춰요’는 뒤에 배치합니다. 캘린더 연동 일정은 항상 막은 시간입니다."},
-    {sel:'[data-ad-recur="weekly"]',do:()=>q1('[data-ad-recur="weekly"]')?.click(),title:"반복 여부를 선택합니다",
-     body:"한 번만 적용할 일정과 매주 반복할 시간을 구분해 등록합니다."},
-    {sel:"#adBg .pf",noLive:true,do:()=>{addSt.open=false;addSt.editRule=null;},title:"반복 일정을 관리합니다",
-     body:"기존 반복 일정은 이 목록에서 수정하거나 삭제합니다. 막음과 후순위 배지는 실제 시간 판정을 나타냅니다."},
-    {sel:".cal-legend",title:"설정 결과를 캘린더에서 확인합니다",
-     body:"막은 시간은 빗금, 우선순위가 낮은 시간은 회색으로 표시되며 시간 후보 계산에도 동일하게 적용됩니다."},
+  protect:{nm:"내 시간 지키기",desc:"회의 제외 시간을 설정합니다",cleanup(){addSt.open=false;addSt.editRule=null;},steps:[
+    {sel:"#fab",do:openTourFabMenu,title:"일정 추가 메뉴",body:"강조된 + 버튼을 누르세요."},
+    {sel:"#fabEvent",do:()=>q1("#fabEvent")?.click(),title:"내 일정 추가",body:"내 일정 추가를 누르세요."},
+    {sel:'[data-ad-h="1"]',do:()=>q1('[data-ad-h="1"]')?.click(),title:"시간 판정",body:"막아둬요 또는 우선순위만 낮춰요를 선택하세요."},
+    {sel:'[data-ad-recur="weekly"]',do:()=>q1('[data-ad-recur="weekly"]')?.click(),title:"반복 설정",body:"한 번만 또는 매주 반복을 선택하세요."},
+    {sel:"#adBg .pf",noLive:true,do:()=>{addSt.open=false;addSt.editRule=null;},title:"반복 일정 관리",body:"연필과 휴지통으로 일정을 관리하세요."},
+    {sel:".cal-legend",title:"캘린더 확인",body:"빗금과 회색으로 설정 결과를 확인하세요."},
   ]},
-  respond:{nm:"초대에 답하기",desc:"동의와 불가 응답이 회의 확정에 반영되는 과정을 확인합니다",cleanup(){},steps:[
-    {sel:".respond-side",alt:'.stat-card[data-stat="respond"]',title:"응답이 필요한 초대를 확인합니다",
-     body:"내 응답이 남아 있는 회의가 표시됩니다. 모든 초대에 답하면 좌측 응답 패널은 사라집니다."},
-    {sel:".respond-side .qcard .qbtn.pri",alt:'.stat-card[data-stat="respond"]',title:"동의 또는 불가로 답합니다",
-     body:"불가를 선택해도 사유는 요구하거나 공유하지 않습니다. 필참 참석자가 모두 동의하면 회의가 확정됩니다."},
-    {sel:".wk-evt.lay-invite",alt:".cal-legend",title:"확정 전 회의는 점선으로 표시됩니다",
-     body:"응답을 기다리는 동안에는 일정이 점선 카드로 표시되고, 확정되면 파란색 ON AIR 확정 카드로 변경됩니다."},
+  respond:{nm:"초대에 답하기",desc:"초대 응답 과정을 확인합니다",cleanup(){},steps:[
+    {sel:".respond-side",alt:'.stat-card[data-stat="respond"]',title:"응답할 초대",body:"내 응답을 기다리는 회의를 확인하세요."},
+    {sel:".respond-side .qcard .qbtn.pri",alt:'.stat-card[data-stat="respond"]',title:"응답 선택",body:"동의 또는 불가를 선택하세요."},
+    {sel:".wk-evt.lay-invite",alt:".cal-legend",title:"확정 상태",body:"점선 카드가 파란 ON AIR 확정 카드로 바뀝니다."},
   ]},
-  wrap:{nm:"회의 정리",desc:"끝난 회의의 결론과 이월 안건을 기록합니다",cleanup(){st.recWrap=null;st.recWrapItems=null;st.statList=null;st.recView=null;},steps:[
-    {sel:'.stat-card[data-stat="wrap"]',do:()=>q1('.stat-card[data-stat="wrap"]')?.click(),title:"정리가 필요한 회의를 확인합니다",
-     body:"종료된 회의는 안건별 정리가 완료될 때까지 이 영역에 남습니다."},
-    {sel:'#mlBg [data-ml-act^="wraprec"]',do:()=>q1('#mlBg [data-ml-act^="wraprec"]')?.click(),title:"정리할 회의를 선택합니다",
-     body:"목록의 회의를 선택하면 안건별 결론을 입력하는 화면이 열립니다."},
-    {sel:"[data-rw-res]",title:"안건마다 결론을 한 줄로 남깁니다",
-     body:"결론이 나지 않았다면 ‘결정 없음’으로 기록할 수 있습니다. 후속 논의가 필요한 안건은 이월합니다."},
-    {sel:"#rwSave",title:"저장된 내용은 참석자에게 공유됩니다",
-     body:"한 사람이 정리하면 모든 참석자가 같은 회의 기록을 확인합니다. 이 가이드에서는 실제로 저장하지 않습니다."},
+  wrap:{nm:"회의 정리",desc:"회의 결과를 기록합니다",cleanup(){st.recWrap=null;st.recWrapItems=null;st.statList=null;st.recView=null;},steps:[
+    {sel:'.stat-card[data-stat="wrap"]',do:()=>q1('.stat-card[data-stat="wrap"]')?.click(),title:"정리할 회의",body:"정리할 회의 카드를 누르세요."},
+    {sel:'#mlBg [data-ml-act^="wraprec"]',do:()=>q1('#mlBg [data-ml-act^="wraprec"]')?.click(),title:"회의 선택",body:"목록에서 정리할 회의를 누르세요."},
+    {sel:"[data-rw-res]",title:"안건별 결론",body:"결론을 입력하고 완료 또는 이월을 선택하세요."},
+    {sel:"#rwSave",title:"기록 공유",body:"저장하면 참석자에게 같은 기록이 공유됩니다."},
   ]},
 };
+const TOUR_COPY_BANNED=/(아니라|아닌|않고|않습니다|없으면|못)/;
+const TOUR_COPY_ERRORS=Object.entries(TOURS).flatMap(([key,tour])=>tour.steps.flatMap((step,index)=>{
+  const copy=`${step.title} ${step.body}`;
+  return TOUR_COPY_BANNED.test(copy)||step.body.length>65?[`${key}.${index+1}`]:[];
+}));
+if(TOUR_COPY_ERRORS.length)console.error("[ON AIR onboarding copy]",TOUR_COPY_ERRORS);
 let _tourTransitioning=false,_tourTarget=null,_tourPlaceRaf=0;
 function resetTourSurface(){
   st.tourHub=false;st.view="cal";st.calView="week";st.calOff=0;st.modalOpen=false;st.statList=null;st.notif=false;
@@ -4634,8 +4614,7 @@ function tourElementVisible(el){
 function currentTourTarget(step){
   const main=document.querySelector(step.sel);if(tourElementVisible(main))return{el:main,alt:false};
   const alt=step.alt?document.querySelector(step.alt):null;if(tourElementVisible(alt))return{el:alt,alt:true};
-  const fallback=document.querySelector("#tbHelp")||document.querySelector(".page-head");
-  return{el:fallback,alt:true,missing:true};
+  return{el:null,alt:false,missing:true};
 }
 function renderTour(){
   const layer=document.getElementById("tourlayer");if(!layer)return;
@@ -4645,20 +4624,22 @@ function renderTour(){
   const i=Math.max(0,Math.min(st.tour||0,steps.length-1)),step=steps[i],target=currentTourTarget(step),el=target.el;
   st.tour=i;_tourTarget=el;
   const last=i===steps.length-1,live=!!step.do&&!step.noLive&&!target.missing;
-  const body=step.body+(target.missing?`<span class="tour-missing">현재 화면에 대상 항목이 없어 설명만 표시합니다.</span>`:"");
+  const targetLayer=target.missing
+    ?`<div class="tour-blk full"></div>`
+    :`${["t","b","l","r"].map(k=>`<div class="tour-blk" data-tb="${k}"></div>`).join("")}
+      ${live?"":`<div class="tour-cover" id="tourCover"></div>`}
+      <div class="tour-preview" id="tourPreview" aria-hidden="true"></div>
+      <div class="tour-hole${live?" live":""}" id="tourHole"></div>`;
   layer.innerHTML=`
-    ${["t","b","l","r"].map(k=>`<div class="tour-blk" data-tb="${k}"></div>`).join("")}
-    ${live?"":`<div class="tour-cover" id="tourCover"></div>`}
-    <div class="tour-preview" id="tourPreview" aria-hidden="true"></div>
-    <div class="tour-hole${live?" live":""}" id="tourHole"></div>
+    ${targetLayer}
     <div class="tour-tip" id="tourTip" role="dialog" aria-label="${tour.nm} 온보딩" aria-live="polite" tabindex="-1">
       <div class="tour-progress" role="progressbar" aria-label="진행률" aria-valuemin="1" aria-valuemax="${steps.length}" aria-valuenow="${i+1}"><i style="width:${((i+1)/steps.length)*100}%"></i></div>
       <div class="tour-step">${tour.nm} · ${i+1}/${steps.length}</div>
       <div class="tour-title">${step.title}</div>
-      <div class="tour-body">${body}</div>
+      <div class="tour-body">${step.body}</div>
       <div class="tour-acts"><button class="link-btn" id="tourSkip">${st.tourAuto?"건너뛰기":"가이드 종료"}</button><div class="tour-nav"><button class="tour-prev" id="tourPrev"${i===0?" disabled":""}>이전</button><button class="btn btn-p btn-sm" id="tourNext">${last?"완료":"다음"}</button></div></div>
     </div>`;
-  placeTour(el);
+  if(target.missing)placeTourFallback();else placeTour(el);
   document.getElementById("tourSkip").onclick=endTour;
   document.getElementById("tourPrev").onclick=()=>{if(i>0)rebuildTourTo(i-1);};
   document.getElementById("tourNext").onclick=()=>{
@@ -4672,7 +4653,12 @@ function renderTour(){
     else if(e.key==="ArrowLeft"&&i>0){e.preventDefault();rebuildTourTo(i-1);}
     else if(e.key==="ArrowRight"){e.preventDefault();document.getElementById("tourNext")?.click();}
   };
-  requestAnimationFrame(()=>{if(st.tourKey&&_tourTarget===el){ensureTourTargetVisible(el);placeTour(el);tip.focus({preventScroll:true});}});
+  requestAnimationFrame(()=>{
+    if(!st.tourKey||_tourTarget!==el)return;
+    if(target.missing)placeTourFallback();
+    else{ensureTourTargetVisible(el);placeTour(el);}
+    tip.focus({preventScroll:true});
+  });
 }
 function ensureTourTargetVisible(el){
   if(!tourElementVisible(el))return;
@@ -4720,10 +4706,17 @@ function placeTour(el){
   const p=candidates.find(fits)||{x:clampX(r.left),y:clampY(r.bottom+gap)};
   tip.style.left=p.x+"px";tip.style.top=p.y+"px";
 }
+function placeTourFallback(){
+  const tip=document.getElementById("tourTip");if(!tip)return;
+  const vw=innerWidth,vh=innerHeight,tw=tip.offsetWidth,th=tip.offsetHeight;
+  tip.style.left=Math.max(12,(vw-tw)/2)+"px";
+  tip.style.top=Math.max(12,(vh-th)/2)+"px";
+}
 function scheduleTourPlacement(){
   cancelAnimationFrame(_tourPlaceRaf);_tourPlaceRaf=requestAnimationFrame(()=>{
     if(!st.tourKey)return;const step=TOURS[st.tourKey]?.steps[st.tour];if(!step)return;
-    const target=currentTourTarget(step).el;if(target){_tourTarget=target;placeTour(target);}
+    const resolved=currentTourTarget(step);_tourTarget=resolved.el;
+    if(resolved.missing)placeTourFallback();else placeTour(resolved.el);
   });
 }
 window.addEventListener("resize",scheduleTourPlacement);
