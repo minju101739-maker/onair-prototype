@@ -1139,7 +1139,6 @@ tr.opt-row .mat-cell .mf{opacity:.85}
 .ml-tag{flex:none;font-size:var(--fs-2xs);font-weight:800;border-radius:var(--rp);padding:2px 8px}
 .ml-tag.air{background:var(--attention-s);color:var(--attention-d)}
 .ml-tag.blue{background:var(--blue-s);color:var(--blue-d)}
-.ml-tag.onair{background:var(--blue-s);color:var(--blue-d);border:1px solid var(--blue-l);padding:2px 9px}
 .ml-go{width:14px;height:14px;stroke:var(--faintest);stroke-width:2;fill:none;flex:none;margin-left:2px}
 .ml-empty{padding:22px 8px;text-align:center;font-size:var(--fs-sm);color:var(--faint);line-height:1.6}
 
@@ -1430,7 +1429,7 @@ textarea.f-line{resize:vertical;min-height:86px;line-height:1.5}
 .notif-dot.confirm{background:var(--blue)}
 .notif-dot.wrap{background:var(--mint)}
 .notif-dot.progress{background:var(--faint)}
-.notif-dot.reminder{background:var(--blue)}
+.notif-dot.reminder{background:#D79A24}
 .notif-body{min-width:0;font-size:12px;color:var(--strong);line-height:1.5}
 .notif-context{display:block;margin-top:3px;font-size:10.5px;font-weight:650;color:var(--blue-d)}
 .notif-time{display:block;margin-top:2px;font-size:10.5px;color:var(--faintest);font-weight:600}
@@ -3083,6 +3082,7 @@ function makeMeeting(o){
 /* 알림 — 지나간 사건의 통지(과거 시제만, DESIGN-SYSTEM §7.3). 행동 요청은 조율 큐가 담당.
    표준 형식: 새 알림 = 벨 뱃지 + 목록에서 파란 점·틴트, 패널을 열면 읽음 처리되어 뱃지가 사라진다 */
 const NOTIFS=[
+  {t:"오늘 09:30",msg:"<b>로드맵 리뷰</b> 응답 리마인드 — 권민주님이 동의 응답을 요청했습니다",context:"월 7/13 16:00–17:00 · 박민준 수신",kind:"reminder",read:false},
   {t:"어제 17:42",msg:"<b>서현우 1:1</b> 확정 — 수 11:00 · 판교 4F 포커스룸",kind:"confirm",read:false},
   {t:"어제 14:10",msg:"<b>커미티 미팅</b> 종결 카드가 배포되었습니다 — 이월 2건",kind:"wrap",read:false},
   {t:"6/30 09:05",msg:"Google Workspace 캘린더가 연동되었습니다 (free/busy 전용)",read:true},
@@ -4489,8 +4489,8 @@ function wireConsent(){
     e.stopPropagation();const id=b.dataset.remind;if(m.reminded[id])return;
     const p=mProp(m),whenText=p?fullSlotLabel(p.d,fmtT(p.h*60),fmtT(p.h*60+m.dur)):"제안 시간 확인 필요";
     m.reminded[id]=nowStamp();
-    const queued=notify(`<b>${m.title}</b> 동의 응답 리마인드가 도착했습니다 — ${whenText}`,"reminder",{
-      context:`수신 알림 미리보기 · 발신 ${ME.id} · 수신 ${id}`,
+    const queued=notify(`<b>${m.title}</b> 응답 리마인드 — ${ME.id}님이 동의 응답을 요청했습니다`,"reminder",{
+      context:`${whenText} · ${id} 수신`,
       senderId:ME.id,recipientId:id,entityType:"meeting",entityId:m.id
     });
     if(queued){openNotif();toast(`<strong>${id}</strong>에게 리마인드를 보냈습니다. 수신 알림 미리보기를 열었습니다.`);}
