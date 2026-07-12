@@ -1426,7 +1426,9 @@ textarea.f-line{resize:vertical;min-height:86px;line-height:1.5}
 .notif-dot.confirm{background:var(--blue)}
 .notif-dot.wrap{background:var(--mint)}
 .notif-dot.progress{background:var(--faint)}
+.notif-dot.reminder{background:var(--blue)}
 .notif-body{min-width:0;font-size:12px;color:var(--strong);line-height:1.5}
+.notif-context{display:block;margin-top:3px;font-size:10.5px;font-weight:650;color:var(--blue-d)}
 .notif-time{display:block;margin-top:2px;font-size:10.5px;color:var(--faintest);font-weight:600}
 .notif-empty{padding:24px 16px;text-align:center;font-size:11.5px;color:var(--faint)}
 /* ── 온보딩 투어(코치마크) — 스포트라이트 구멍 + 말풍선. z-index 80 = 최상위 ── */
@@ -1986,7 +1988,7 @@ button:focus-visible{outline:2px solid var(--blue-l);outline-offset:1px}
 .meeting-detail-modal .invite3-sub{font-size:10.5px;font-weight:550;color:var(--faint);line-height:1.45}
 .meeting-agenda-block{min-width:0}
 .meeting-agenda-main{display:flex;align-items:center;gap:6px;min-width:0}
-.meeting-agenda-trigger{display:inline-flex;align-items:center;gap:7px;min-width:0;max-width:100%;margin:-3px 0;padding:3px 5px 3px 0;border-radius:5px;color:var(--strong);text-align:left;cursor:pointer}
+.meeting-agenda-trigger{display:inline-flex;align-items:center;gap:7px;min-width:0;max-width:100%;margin:-3px 0;padding:3px 5px 3px 0;border-radius:5px;color:inherit;font:inherit;font-size:inherit;font-weight:inherit;line-height:inherit;letter-spacing:inherit;text-align:left;cursor:pointer}
 .meeting-agenda-trigger:hover,.meeting-agenda-trigger:focus-visible{color:var(--blue-d);background:var(--blue-s);outline:none}
 .meeting-agenda-title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .meeting-agenda-chevron{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
@@ -2442,6 +2444,23 @@ const MY_EVENTS=[
   {d:10,s:"16:00",e:"17:00",t:"월간 로드맵 리뷰",k:"busy",src:"onair"},
   {d:12,s:"10:00",e:"12:00",t:"테니스 레슨",k:"busy",src:"google"},
   {d:13,s:"18:00",e:"20:00",t:"가족 저녁",k:"busy",src:"manual"},
+  /* ── 그 다음 주(7/20–7/26) — 월간 시드(7/20 고객 인터뷰 · 7/21 그로스 지표 점검 · 7/22 정책 문서 검토 · 7/24 디자인 리뷰)와 시간 분리 ── */
+  {d:14,s:"09:00",e:"09:30",t:"데일리 스탠드업",k:"busy",src:"onair"},
+  {d:14,s:"14:00",e:"15:00",t:"주간 스크럼",k:"busy",src:"onair"},
+  {d:15,s:"09:00",e:"09:30",t:"데일리 스탠드업",k:"busy",src:"onair"},
+  {d:15,s:"13:00",e:"14:00",t:"스프린트 플래닝",k:"busy",src:"onair"},
+  {d:15,s:"19:00",e:"20:30",t:"저녁 약속",k:"busy",src:"manual"},
+  {d:16,s:"09:00",e:"10:00",t:"주간 회고",k:"busy",src:"onair"},
+  {d:16,s:"11:00",e:"12:00",t:"사용자 인터뷰 정리",k:"busy",src:"onair"},
+  {d:16,s:"19:00",e:"20:00",t:"학원 수업",k:"busy",src:"google"},
+  {d:17,s:"09:00",e:"09:30",t:"데일리 스탠드업",k:"busy",src:"onair"},
+  {d:17,s:"10:30",e:"11:30",t:"데이터 품질 점검",k:"busy",src:"onair"},
+  {d:17,s:"15:00",e:"16:00",t:"하반기 채용 싱크",k:"busy",src:"onair"},
+  {d:18,s:"09:00",e:"09:30",t:"데일리 스탠드업",k:"busy",src:"onair"},
+  {d:18,s:"12:00",e:"13:00",t:"은행 업무",k:"busy",src:"manual"},
+  {d:18,s:"16:00",e:"17:00",t:"스프린트 데모",k:"busy",src:"onair"},
+  {d:19,s:"10:00",e:"12:00",t:"테니스 레슨",k:"busy",src:"google"},
+  {d:20,s:"12:00",e:"14:00",t:"가족 점심",k:"busy",src:"manual"},
 ];
 const monthEvent=(off,day,s,e,t,src="google",hard=false)=>({id:`mo${off}_${day}_${s.replace(":","")}_${t}`,date:monthKey(off,day),s,e,t,k:"busy",src,hard,mo:off});
 const MONTH_EVENTS=[
@@ -2451,7 +2470,7 @@ const MONTH_EVENTS=[
   monthEvent(0,15,"10:00","11:00","온보딩 실험 리뷰","onair"),
   monthEvent(0,16,"14:00","15:30","제품 워크숍","onair"),
   monthEvent(0,20,"11:00","12:00","고객 인터뷰","onair"),   /* 7/17은 제헌절 — 회의 없음 */
-  monthEvent(0,21,"09:30","10:30","그로스 지표 점검","onair"),
+  monthEvent(0,21,"10:30","11:30","그로스 지표 점검","onair"),
   monthEvent(0,22,"15:00","16:00","정책 문서 검토","manual",true),
   monthEvent(0,24,"13:00","14:00","디자인 리뷰","onair"),
   monthEvent(0,27,"10:00","12:00","월간 로드맵 리뷰","onair"),
@@ -2541,6 +2560,20 @@ const INVITES={
     agree:2,myRole:"exec",att:"onsite",prep:"이전 대상 목록 확인",
     agendas:["이전 범위 합의","일정·담당 정리"],
     who:[["박민준","decide"],["서현우","info"],["이하준","exec"]]},
+  okr:{title:"하반기 OKR 워크숍",hostId:"강태호",origin:"정기 회의",purposes:["ideate"],dur:90,
+    proposed:{d:15,h:14,s:"14:00",e:"15:30",label:fullSlotLabel(15,"14:00","15:30")},
+    alternates:[`대안 1 · ${fullDayLabel(16)} 14:00`,`대안 2 · ${fullDayLabel(17)} 13:00`],
+    format:"offline",loc:"판교 5F · 대회의실 (가예약)",locShort:"판교 5F · 대회의실",
+    agree:2,myRole:"info",att:"onsite",prep:"상반기 지표 정리",
+    agendas:["상반기 OKR 회고","하반기 목표 후보 발산"],
+    who:[["강태호","decide"],["한지우","info"],["김서연","info"],["서현우","exec"]]},
+  security:{title:"보안 점검 후속 논의",hostId:"이하준",origin:"이전 회의 후속",purposes:["decide"],dur:60,
+    proposed:{d:17,h:13,s:"13:00",e:"14:00",label:fullSlotLabel(17,"13:00","14:00")},
+    alternates:[`대안 1 · ${fullDayLabel(18)} 10:00`],
+    format:"offline",loc:"판교 4F · 포커스룸 (가예약)",locShort:"판교 4F · 포커스룸",
+    agree:1,myRole:"exec",att:"onsite",prep:"담당 파트 조치 현황",
+    agendas:["지적 항목 대응 방안","조치 일정 확정"],
+    who:[["이하준","decide"],["박민준","info"]]},
 };
 const attendForFormat=(format,fallback="onsite")=>format==="online"?"remote":format==="offline"?"onsite":fallback;
 const inviteHostLabel=v=>{const c=contactOf(v.hostId);return c?nameRank(c):"주최자 미정";};
@@ -2691,6 +2724,8 @@ const EVENT_INFO={
   "데이터 품질 점검":{who:["박민준"],r:"온라인",p:"align",myRole:"필참",ag:["파이프라인 오류 점검","보완 일정 합의"]},
   "그로스 실험 리뷰":{who:["정수아","한지우"],r:"온라인",p:"decide",myRole:"필참",ag:["7월 실험 결과 공유","확대/중단 결정"]},
   "플랫폼 마이그레이션 킥오프":{who:["박민준","서현우","이하준"],r:"판교 4F · 포커스룸",p:"align",myRole:"선택",ag:["이전 범위 합의","일정·담당 정리"]},
+  "하반기 OKR 워크숍":{who:["강태호","한지우","김서연"],r:"판교 5F · 대회의실",p:"ideate",myRole:"필참",ag:["상반기 OKR 회고","하반기 목표 후보 발산"]},
+  "보안 점검 후속 논의":{who:["이하준","박민준"],r:"판교 4F · 포커스룸",p:"decide",myRole:"선택",ag:["지적 항목 대응 방안","조치 일정 확정"]},
 };
 const infoOf=x=>EVENT_INFO[x]||null;
 /* ── 회의 기록 저장소(FLOW.md §8) — 안건별 기록: 각자 다르게 남는 기억을 하나의 결론으로 맞추는 산출물 ── */
@@ -3038,13 +3073,14 @@ const NOTIFS=[
 const notifUnreadN=()=>NOTIFS.filter(n=>!n.read).length;
 function openNotif(){st.notifNew=new Set(NOTIFS.filter(n=>!n.read));NOTIFS.forEach(n=>n.read=true);st.notif=true;render();}
 function closeNotif(){st.notif=false;st.notifNew=null;render();}
-/* 알림 3분류 — 설정 토글이 실제로 게이트한다(끄면 그 종류는 쌓이지 않음).
-   confirm=회의 확정 · progress=조율 진행(발송·응답·승인·재제안) · wrap=회의 정리(정리 공유·종결 배포).
+/* 알림 4분류 — 설정 토글이 실제로 게이트한다(끄면 그 종류는 쌓이지 않음).
+   confirm=회의 확정 · progress=조율 진행(발송·응답·승인·재제안) · reminder=응답 리마인드 · wrap=회의 정리(정리 공유·종결 배포).
    연동 같은 무분류 소식은 kind 없이 항상 통지 */
-const NOTIF_GATE={confirm:"notifConfirm",progress:"notifProgress",wrap:"notifWrap"};
-function notify(msg,kind){
-  if(kind&&SETTINGS[NOTIF_GATE[kind]]===false)return;
-  NOTIFS.unshift({t:nowStamp(),msg,kind,read:false});
+const NOTIF_GATE={confirm:"notifConfirm",progress:"notifProgress",reminder:"notifReminder",wrap:"notifWrap"};
+function notify(msg,kind,extra={}){
+  if(kind&&SETTINGS[NOTIF_GATE[kind]]===false)return false;
+  NOTIFS.unshift({t:nowStamp(),msg,kind,read:false,...extra});
+  return true;
 }
 /* 데모 시드 ① 로드맵 리뷰 — 내가 발의·발송 완료, 동의 3/4 진행 중 (조율 현황에 게이지로) */
 MEETINGS.push(makeMeeting({title:"로드맵 리뷰",dur:60,purposes:["align","decide"],origin:"decision",
@@ -3284,7 +3320,7 @@ function addCalModal(){
 }
 
 /* ── 설정 (2뎁스) — 근무시간·주 시작·알림·연동·프라이버시 ── */
-const SETTINGS={notifConfirm:true,notifProgress:true,notifWrap:true};
+const SETTINGS={notifConfirm:true,notifProgress:true,notifReminder:true,notifWrap:true};
 function settingsModal(){
   const tgl=(k)=>`<span class="tgl${SETTINGS[k]?" on":""}" data-tgl="${k}"></span>`;
   const row=(t,s,right)=>`<div class="set-row"><span class="set-i"><span class="set-t">${t}</span>${s?`<span class="set-s">${s}</span>`:""}</span>${right}</div>`;
@@ -3327,6 +3363,7 @@ function settingsModal(){
       <div class="set-grp">알림</div>
       ${row("회의 확정","확정과 캘린더 등록 소식",tgl("notifConfirm"))}
       ${row("조율 진행","발송·응답·승인·재제안 소식",tgl("notifProgress"))}
+      ${row("응답 리마인드","동의·참석 응답을 다시 요청한 소식",tgl("notifReminder"))}
       ${row("회의 정리","정리 공유·종결 카드 배포 소식",tgl("notifWrap"))}
     </div>
     <div class="settings-section">
@@ -4429,7 +4466,17 @@ function wireConsent(){
   document.getElementById("csBg").onclick=e=>{if(e.target.id==="csBg")cl();};
   if(!m)return;
   document.querySelectorAll(".resp-row[data-resp]").forEach(r=>r.onclick=()=>{const id=r.dataset.resp;m.responses[id]=m.responses[id]==="yes"?"no":"yes";m.respTime[id]=nowStamp();render();});
-  document.querySelectorAll(".resp-remind[data-remind]").forEach(b=>b.onclick=e=>{e.stopPropagation();const id=b.dataset.remind;if(m.reminded[id])return;m.reminded[id]=true;render();toast(`<strong>${id}</strong>에게 리마인드를 보냈습니다.`);});
+  document.querySelectorAll(".resp-remind[data-remind]").forEach(b=>b.onclick=e=>{
+    e.stopPropagation();const id=b.dataset.remind;if(m.reminded[id])return;
+    const p=mProp(m),whenText=p?fullSlotLabel(p.d,fmtT(p.h*60),fmtT(p.h*60+m.dur)):"제안 시간 확인 필요";
+    m.reminded[id]=nowStamp();
+    const queued=notify(`<b>${m.title}</b> 동의 응답 리마인드가 도착했습니다 — ${whenText}`,"reminder",{
+      context:`수신 알림 미리보기 · 발신 ${ME.id} · 수신 ${id}`,
+      senderId:ME.id,recipientId:id,entityType:"meeting",entityId:m.id
+    });
+    if(queued){openNotif();toast(`<strong>${id}</strong>에게 리마인드를 보냈습니다. 수신 알림 미리보기를 열었습니다.`);}
+    else{render();toast(`<strong>${id}</strong>에게 리마인드를 보냈습니다. 리마인드 알림 설정은 꺼져 있습니다.`);}
+  });
   const sim=document.getElementById("simAll");if(sim)sim.onclick=()=>{const n=mAutoRespond(m);render();toast(n?`${n}명 응답 접수.`:"이미 모두 응답했습니다.");};
   const ap=document.getElementById("simApprove");if(ap)ap.onclick=()=>{m.approved=true;notify(`<b>${m.title}</b> — ${mSups(m).map(nameRank).join(", ")} 승인`,"progress");render();toast(`<strong>${mSups(m).map(s=>s.id).join(", ")}</strong> 승인 — 확정할 수 있습니다.`);};
   const rp=document.getElementById("reProp");if(rp)rp.onclick=()=>{const i=mNextIdx(m);if(i<0){toast("현재 이후의 대안 후보가 없습니다. 범위·참석자를 조정해 다시 발의해 주세요.");return;}m.proposalIdx=i;m.responses={};m.respTime={};m.reminded={};m.approved=false;notify(`<b>${m.title}</b> ${m.proposalIdx+1}순위로 재제안 — 동의를 다시 받습니다`,"progress");render();toast("다음 미래 후보로 재제안했습니다 — 동의를 다시 받습니다.");};
@@ -4758,7 +4805,7 @@ function notifPop(){
   const newN=st.notifNew?st.notifNew.size:0;
   const rows=NOTIFS.length?NOTIFS.map(n=>`<div class="notif-row${isNew(n)?" new":""}">
       <span class="notif-dot ${n.kind||"etc"}"></span>
-      <span class="notif-body">${n.msg}<span class="notif-time">${n.t}</span></span>
+      <span class="notif-body">${n.msg}${n.context?`<span class="notif-context">${n.context}</span>`:""}<span class="notif-time">${n.t}</span></span>
     </div>`).join("")
     :`<div class="notif-empty">새 알림이 없어요.</div>`;
   return`<div class="notif-scrim" id="nfScrim"></div>
