@@ -182,7 +182,7 @@ CREATE TABLE meetings (
   title          text   NOT NULL,
   origin         meeting_origin_t NOT NULL,                  -- 목적 선택(왜 여는가) — UI 표기는 '목적'
   format         meeting_format_t NOT NULL,
-  duration_min   smallint NOT NULL CHECK (duration_min IN (30,60,90,120)),
+  duration_min   smallint NOT NULL CHECK (duration_min BETWEEN 30 AND 480 AND duration_min % 30 = 0),
   status         meeting_status_t NOT NULL DEFAULT 'draft',
   scribe_id      bigint REFERENCES users(id),                -- 설정 단계 기록 담당 (조회 UI 비노출)
   search_from    date NOT NULL,                              -- 후보 탐색 범위(기본 2주 · 최대 4주)

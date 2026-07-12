@@ -420,7 +420,7 @@ svg{display:block;flex:none}
 .org-more b{color:var(--blue-d)}
 /* ── 연속성 요약 바 (모달 스텝 아래) ── */
 /* ── 만들기 모달 레이아웃 — 좌: 단계 콘텐츠 / 우: "만들어지는 회의" 요약(결과 영역) / 하단: 고정 CTA + inline validation ── */
-.modal-wrap.create{max-width:960px;height:min(810px,calc(100vh - 40px));border-radius:28px;box-shadow:0 32px 80px rgba(25,31,40,.28)}
+.modal-wrap.create{max-width:960px;height:min(940px,calc(100vh - 32px));border-radius:28px;box-shadow:0 32px 80px rgba(25,31,40,.28)}
 .modal-wrap.create .modal-bar{padding:24px 32px 10px}
 .modal-wrap.create .modal-bar h2{font-size:20px;font-weight:850;color:var(--ink);letter-spacing:0}
 .create-body{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr) auto;background:var(--panel)}
@@ -1249,7 +1249,7 @@ tr.opt-row .mat-cell .mf{opacity:.85}
 }
 
 /* ── 생성 모달 v2(레퍼런스 16 메인) — 블루 솔리드 헤더 · 섹션 폼 · 언더라인 인풋 · pill CTA · 도트 진행(15) · 칩 인풋(14) ── */
-.modal-wrap.create.v2{max-width:620px;width:min(620px,94vw);height:auto;max-height:min(800px,calc(100vh - 40px));display:flex;flex-direction:column;border-radius:24px;overflow:hidden;background:#fff}
+.modal-wrap.create.v2{max-width:620px;width:min(620px,94vw);height:min(940px,calc(100vh - 32px));max-height:min(940px,calc(100vh - 32px));display:flex;flex-direction:column;border-radius:24px;overflow:hidden;background:#fff}
 .cm-head{flex:none;display:flex;align-items:center;background:var(--blue);padding:17px 18px 17px 28px}
 .cm-head h2{flex:1;font-size:17px;font-weight:850;color:#fff;letter-spacing:0}
 .cm-x{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;color:rgba(255,255,255,.86);font-size:19px;line-height:1;flex:none}
@@ -1442,7 +1442,7 @@ textarea.f-line{resize:vertical;min-height:86px;line-height:1.5}
 .tour-preview{position:fixed;z-index:81;pointer-events:none;overflow:hidden;isolation:isolate}
 .tour-preview>*{position:relative!important;inset:auto!important;width:100%!important;height:100%!important;min-width:0!important;margin:0!important;transform:none!important;opacity:1!important}
 .tour-hole{position:fixed;z-index:83;border-radius:10px;pointer-events:none;border:2px solid rgba(255,255,255,.98);box-shadow:0 0 0 4px rgba(47,111,237,.38);transition:all .2s ease}
-.tour-hole.live{box-shadow:0 0 0 4px rgba(47,111,237,.55),0 0 20px rgba(47,111,237,.38)}
+.tour-hole.live{border-color:var(--blue);box-shadow:0 0 0 3px rgba(47,111,237,.28),0 0 18px rgba(47,111,237,.24)}
 .hub-row{width:100%;display:flex;align-items:center;gap:12px;text-align:left;padding:13px 6px;border-bottom:1px solid var(--line2);cursor:pointer}
 .hub-row:last-child{border-bottom:none}
 .hub-row:hover{background:var(--panel2)}
@@ -1938,7 +1938,7 @@ button:focus-visible{outline:2px solid var(--blue-l);outline-offset:1px}
 .cm-head p{margin-top:2px;font-size:9.5px;font-weight:550;color:var(--faint);line-height:1.35}
 .cm-x{color:var(--faint);border:1px solid var(--line);border-radius:6px;width:30px;height:30px}
 .cm-x:hover{background:var(--panel2);color:var(--ink)}
-.modal-wrap.create.v2 .create-flow{padding:2px 22px 14px}
+.modal-wrap.create.v2 .create-flow{padding:2px 22px 14px;flex:1;min-height:0}
 .modal-wrap.create.v2 .create-foot{padding:12px 18px 14px;box-shadow:none}
 .modal-wrap.create .stepper{gap:0;padding:8px 20px 10px;border-bottom:1px solid var(--line2)}
 .modal-wrap.create .stp{height:34px;border-radius:0;border-bottom:2px solid transparent;padding:0 10px}
@@ -4246,7 +4246,7 @@ function stage3(){
       <div class="time-range-grid">
         <label class="time-field"><span>시작 시간</span><select class="time-select" id="winStart">${optionTimes(w.s,startFrom,(CAL_END-1)*60,30)}</select></label>
         <label class="time-field"><span>종료 시간</span><select class="time-select" id="winEnd">${optionTimes(w.e,endFrom,CAL_END*60,30)}</select></label>
-        <div class="time-field"><span>소요</span><div class="dur-seg">${[30,60,90,120].map(d=>`<button class="${st.dur===d?"on":""}" data-win-dur="${d}" type="button">${durText(d)}</button>`).join("")}</div></div>
+        <div class="time-field"><span>소요</span><select class="time-select" id="winDur">${Array.from({length:16},(_,i)=>(i+1)*30).map(d=>`<option value="${d}"${st.dur===d?" selected":""}>${durText(d)}</option>`).join("")}</select></div>
       </div>
     </div>
   </div>`;
@@ -4296,7 +4296,7 @@ function wireStage3(){
   const ed=document.getElementById("winEndDate");if(ed)ed.onchange=()=>{st.winEndD=Math.max(st.winStartD,Math.min(RANGE_DAYS-1,dayIndexFromKey(ed.value)));reset();render();};
   const ws=document.getElementById("winStart");if(ws)ws.onchange=()=>{st.winStart=+ws.value;if(st.winEnd<=st.winStart)st.winEnd=Math.min(CAL_END*60,st.winStart+Math.max(st.dur,60));reset();render();};
   const we=document.getElementById("winEnd");if(we)we.onchange=()=>{st.winEnd=+we.value;reset();render();};
-  document.querySelectorAll("[data-win-dur]").forEach(b=>b.onclick=()=>{st.dur=+b.dataset.winDur;if(st.winEnd-st.winStart<st.dur)st.winEnd=Math.min(CAL_END*60,st.winStart+st.dur);reset();render();});
+  const wd=document.getElementById("winDur");if(wd)wd.onchange=()=>{st.dur=+wd.value;if(st.winEnd-st.winStart<st.dur)st.winEnd=Math.min(CAL_END*60,st.winStart+st.dur);reset();render();};
   document.querySelectorAll("[data-cand]").forEach(c=>c.onclick=()=>{st.picked=c.dataset.cand;st.room=null;render();});
   document.querySelectorAll(".room-choice[data-room]").forEach(c=>c.onclick=()=>{st.room=c.dataset.room;render();});
   const aw=document.getElementById("adjWide");if(aw)aw.onclick=()=>{const d=firstFutureRangeDay(st.dur,60,CAL_START*60,CAL_END*60);st.winStartD=d;st.winEndD=Math.min(d+13,RANGE_DAYS-1);st.winStart=minFutureStart(d,60,CAL_START*60);st.winEnd=CAL_END*60;reset();render();};
@@ -4514,6 +4514,7 @@ function wireConsent(){
 const q1=s=>document.querySelector(s);
 function openTourFabMenu(){
   const menu=q1("#fabMenu"),scrim=q1("#fabScrim"),fab=q1("#fab");
+  if(fab&&menu?.hidden&&typeof fab.onclick==="function"){fab.click();return;}
   if(menu)menu.hidden=false;if(scrim)scrim.hidden=false;if(fab)fab.classList.add("open");
 }
 const TOURS={
@@ -4543,7 +4544,7 @@ const TOURS={
     {sel:"#fabEvent",do:()=>q1("#fabEvent")?.click(),title:"내 일정 추가",body:"내 일정 추가를 누르세요."},
     {sel:'[data-ad-h="1"]',do:()=>q1('[data-ad-h="1"]')?.click(),title:"시간 판정",body:"막아둬요 또는 우선순위만 낮춰요를 선택하세요."},
     {sel:'[data-ad-recur="weekly"]',do:()=>q1('[data-ad-recur="weekly"]')?.click(),title:"반복 설정",body:"한 번만 또는 매주 반복을 선택하세요."},
-    {sel:"#adBg .pf",noLive:true,do:()=>{addSt.open=false;addSt.editRule=null;},title:"반복 일정 관리",body:"연필과 휴지통으로 일정을 관리하세요."},
+    {sel:"#adBg .pf:first-of-type .pf-actions",noLive:true,do:()=>{addSt.open=false;addSt.editRule=null;},title:"반복 일정 관리",body:"연필로 수정하고 휴지통으로 삭제하세요."},
     {sel:".cal-legend",title:"캘린더 확인",body:"빗금과 회색으로 설정 결과를 확인하세요."},
   ]},
   respond:{nm:"초대에 답하기",desc:"초대 응답 과정을 확인합니다",cleanup(){},steps:[
@@ -4627,8 +4628,7 @@ function renderTour(){
   const targetLayer=target.missing
     ?`<div class="tour-blk full"></div>`
     :`${["t","b","l","r"].map(k=>`<div class="tour-blk" data-tb="${k}"></div>`).join("")}
-      ${live?"":`<div class="tour-cover" id="tourCover"></div>`}
-      <div class="tour-preview" id="tourPreview" aria-hidden="true"></div>
+      ${live?"":`<div class="tour-cover" id="tourCover"></div><div class="tour-preview" id="tourPreview" aria-hidden="true"></div>`}
       <div class="tour-hole${live?" live":""}" id="tourHole"></div>`;
   layer.innerHTML=`
     ${targetLayer}
@@ -4640,9 +4640,10 @@ function renderTour(){
       <div class="tour-acts"><button class="link-btn" id="tourSkip">${st.tourAuto?"건너뛰기":"가이드 종료"}</button><div class="tour-nav"><button class="tour-prev" id="tourPrev"${i===0?" disabled":""}>이전</button><button class="btn btn-p btn-sm" id="tourNext">${last?"완료":"다음"}</button></div></div>
     </div>`;
   if(target.missing)placeTourFallback();else placeTour(el);
-  document.getElementById("tourSkip").onclick=endTour;
-  document.getElementById("tourPrev").onclick=()=>{if(i>0)rebuildTourTo(i-1);};
-  document.getElementById("tourNext").onclick=()=>{
+  document.getElementById("tourSkip").onclick=e=>{e.stopPropagation();endTour();};
+  document.getElementById("tourPrev").onclick=e=>{e.stopPropagation();if(i>0)rebuildTourTo(i-1);};
+  document.getElementById("tourNext").onclick=e=>{
+    e.stopPropagation();
     if(i>=steps.length-1){endTour();return;}
     runTourAction(step);
     if(st.tourKey){st.tour=i+1;render();}
@@ -4669,20 +4670,21 @@ function ensureTourTargetVisible(el){
 }
 function cloneTourTarget(el,preview,r){
   if(!preview||!el)return;
-  const clone=el.cloneNode(true),originalFields=[el,...el.querySelectorAll("input,textarea,select")],cloneFields=[clone,...clone.querySelectorAll("input,textarea,select")];
+  const style=getComputedStyle(el),clone=el.cloneNode(true),originalFields=[el,...el.querySelectorAll("input,textarea,select")],cloneFields=[clone,...clone.querySelectorAll("input,textarea,select")];
   clone.removeAttribute("id");clone.querySelectorAll("[id]").forEach(n=>n.removeAttribute("id"));clone.removeAttribute("hidden");
   originalFields.forEach((o,i)=>{const c=cloneFields[i];if(!c)return;if("value" in o)c.value=o.value;if("checked" in o)c.checked=o.checked;});
   clone.style.pointerEvents="none";clone.style.width="100%";clone.style.height="100%";
   preview.replaceChildren(clone);
   preview.style.left=r.left+"px";preview.style.top=r.top+"px";preview.style.width=r.width+"px";preview.style.height=r.height+"px";
-  preview.style.borderRadius=getComputedStyle(el).borderRadius;
+  preview.style.borderRadius=style.borderRadius;
+  preview.style.backgroundColor=style.backgroundColor==="rgba(0, 0, 0, 0)"?"var(--panel)":style.backgroundColor;
 }
 function placeTour(el){
   const hole=document.getElementById("tourHole"),tip=document.getElementById("tourTip");
   const preview=document.getElementById("tourPreview");
-  if(!tourElementVisible(el)||!hole||!tip||!preview)return;
+  if(!tourElementVisible(el)||!hole||!tip)return;
   const r=el.getBoundingClientRect(),pad=6,vw=window.innerWidth,vh=window.innerHeight;
-  cloneTourTarget(el,preview,r);
+  if(preview)cloneTourTarget(el,preview,r);
   const hx=Math.max(4,r.left-pad),hy=Math.max(4,r.top-pad),hr=Math.min(vw-4,r.right+pad),hb=Math.min(vh-4,r.bottom+pad),hw=Math.max(0,hr-hx),hh2=Math.max(0,hb-hy);
   hole.style.left=hx+"px";hole.style.top=hy+"px";hole.style.width=hw+"px";hole.style.height=hh2+"px";
   const cover=document.getElementById("tourCover");
@@ -4696,12 +4698,19 @@ function placeTour(el){
   if(R){R.style.cssText+=`;left:${hx+hw}px;top:${hy}px;width:${Math.max(0,vw-hx-hw)}px;height:${hh2}px`;}
   const tw=tip.offsetWidth,thh=tip.offsetHeight;
   const gap=16,clampX=x=>Math.min(Math.max(12,x),vw-tw-12),clampY=y=>Math.min(Math.max(12,y),vh-thh-12);
-  const candidates=[
+  const standardCandidates=[
     {x:clampX(r.left),y:r.bottom+gap},
     {x:clampX(r.left),y:r.top-thh-gap},
     {x:r.right+gap,y:clampY(r.top)},
     {x:r.left-tw-gap,y:clampY(r.top)}
   ];
+  const fabCandidates=[
+    {x:r.left-tw-gap,y:clampY(r.top)},
+    {x:clampX(r.left),y:r.top-thh-gap},
+    {x:r.right+gap,y:clampY(r.top)},
+    {x:clampX(r.left),y:r.bottom+gap}
+  ];
+  const candidates=el.closest(".fab-menu")?fabCandidates:standardCandidates;
   const fits=p=>p.x>=12&&p.y>=12&&p.x+tw<=vw-12&&p.y+thh<=vh-12;
   const p=candidates.find(fits)||{x:clampX(r.left),y:clampY(r.bottom+gap)};
   tip.style.left=p.x+"px";tip.style.top=p.y+"px";
@@ -4788,8 +4797,8 @@ function eventModal(e){
   const info=infoOf(e.t);
   const isManual=e.src==="manual",hard=evHard(e),past=eventPast(e);
   const kv=(k,v)=>`<div class="kv"><span>${k}</span><b>${v}</b></div>`;
-  const editIcon=`<svg viewBox="0 0 24 24"><path d="M4 20h4l10.5-10.5a2.8 2.8 0 0 0-4-4L4 16v4Z"/><path d="m13.5 6.5 4 4"/></svg>`;
-  const trashIcon=`<svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/></svg>`;
+  const editIcon=`<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>`;
+  const trashIcon=`<svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 10v6M14 10v6"/></svg>`;
   const actions=isManual&&!past?`<button class="icon-action" id="evEdit" aria-label="일정 수정" title="수정">${editIcon}</button><button class="icon-action danger" id="evDel" aria-label="일정 삭제" title="삭제">${trashIcon}</button><button class="link-btn" id="evHardTog">${hard?"우선순위만 낮추기":"회의 제외 시간으로 변경"}</button>`:"";
   if(info){
     const peopleHtml=meetingPeopleHtml(["권민주",...info.who]);
@@ -5024,8 +5033,8 @@ function addEventModal(){
             :`회의를 막지 않아요 — 겹치면 <b style="color:var(--ink)">우선순위만 낮아져요</b>.`}</span>
         </div>`;
   /* 매주 반복 탭 = 반복 일정 관리처(구 '회의 제외 시간' 모달 흡수) — 기존 규칙의 수정·삭제도 여기서 */
-  const editIcon=`<svg viewBox="0 0 24 24"><path d="M4 20h4l10.5-10.5a2.8 2.8 0 0 0-4-4L4 16v4Z"/><path d="m13.5 6.5 4 4"/></svg>`;
-  const trashIcon=`<svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/></svg>`;
+  const editIcon=`<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>`;
+  const trashIcon=`<svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 10v6M14 10v6"/></svg>`;
   const ruleRows=weekly?MY_PREFS.map((r,i)=>`<div class="pf"><div class="pf-ic ${r.pol==="block"?"block":"avoid"}">${r.pol==="block"?"막음":"후순위"}</div><div class="pf-t">${r.rule}<div class="pf-sub">${r.anchor}</div></div><span class="pf-actions"><button class="pf-action icon" data-pf-edit="${i}" aria-label="${r.rule} 수정" title="수정">${editIcon}</button><button class="pf-action icon danger" data-pf-rm="${i}" aria-label="${r.rule} 삭제" title="삭제">${trashIcon}</button></span></div>`).join(""):"";
   const rulesBlock=weekly?`<div class="field" style="margin-top:14px"><label>반복 일정 ${MY_PREFS.length}개</label>${ruleRows||`<div class="pf-sub" style="padding:2px 2px 0">아직 없습니다.</div>`}</div>`:"";
   const editing=!!addSt.editing,editingRule=addSt.editRule!=null;
