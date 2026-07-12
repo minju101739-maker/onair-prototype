@@ -2100,6 +2100,9 @@ button:focus-visible{outline:2px solid var(--blue-l);outline-offset:1px}
 .followup-row:hover{background:#F8FAFC}
 .followup-row.sel{background:var(--blue-s)}
 .followup-row .cand-chk{width:17px;height:17px;border-radius:4px}
+/* 선택 신호 2개(틴트+체크) — cand-card 스코프 규칙이 followup-row엔 안 닿아 체크가 비어 있었다 */
+.followup-row.sel .cand-chk{background:var(--blue);border-color:var(--blue)}
+.followup-row.sel .cand-chk svg{opacity:1}
 .followup-title{font-size:11.5px;font-weight:750;color:var(--strong)}
 .followup-meta{margin-top:2px;font-size:9.5px;font-weight:550;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .followup-badge{font-size:9.5px;font-weight:700;color:var(--blue-d);white-space:nowrap}
