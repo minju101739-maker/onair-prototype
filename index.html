@@ -2097,6 +2097,9 @@ button:focus-visible{outline:2px solid var(--blue-l);outline-offset:1px}
 .followup-list{margin-top:8px;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#fff}
 .followup-row{display:grid;grid-template-columns:17px minmax(0,1fr) auto;align-items:center;gap:9px;min-height:46px;padding:7px 10px;border-bottom:1px solid var(--line2);cursor:pointer}
 .followup-row:last-child{border-bottom:0}
+.followup-pick .inp{margin:8px 0 6px;padding:9px 12px;font-size:var(--fs-sm)}
+.followup-pick .followup-list{max-height:264px;overflow-y:auto}
+.followup-count{position:sticky;bottom:0;background:var(--panel);border-top:1px solid var(--line2);padding:7px 12px}
 .followup-row:hover{background:#F8FAFC}
 .followup-row.sel{background:var(--blue-s)}
 .followup-row .cand-chk{width:17px;height:17px;border-radius:4px}
@@ -3806,7 +3809,7 @@ function applyRecord(rec,follow){
 }
 function openCreate(stage,seed){
   st.modalOpen=true;st.stage=stage==null?0:stage;st.room=null;
-  if(stage==null){st.title="";st.selected=new Set();st.roles={};st.attend={};st.approvers=new Set();st.query="";st.picked=null;st.winStartD=null;st.winEndD=null;st.winStart=null;st.winEnd=null;st.purposes=[];st.defPurpose=null;st.origin=null;st.agendas=[];st.agendaDraft="";st.source="";st.format="offline";st.scribe="나";st.decision="owner";st.linkedRecord=null;st.showSource=false;st.showSettings=false;st.openTeams=new Set();st.orgPath={d:null,t:null};st.fmtTouched=false;st.mobPane="add";st.sumOpen=false;}
+  if(stage==null){st.title="";st.selected=new Set();st.roles={};st.attend={};st.approvers=new Set();st.query="";st.picked=null;st.winStartD=null;st.winEndD=null;st.winStart=null;st.winEnd=null;st.purposes=[];st.defPurpose=null;st.origin=null;st.followupQ="";st.agendas=[];st.agendaDraft="";st.source="";st.format="offline";st.scribe="나";st.decision="owner";st.linkedRecord=null;st.showSource=false;st.showSettings=false;st.openTeams=new Set();st.orgPath={d:null,t:null};st.fmtTouched=false;st.mobPane="add";st.sumOpen=false;}
   if(seed&&Array.isArray(seed.people)){
     st.selected=new Set(seed.people.filter(id=>id!==ME.id&&CONTACTS.some(c=>c.id===id)));
     st.selected.forEach(id=>{st.roles[id]="info";});
@@ -3957,7 +3960,10 @@ function stage0(){
     <div class="sec-t" style="margin-top:2px">목적</div>
     <div class="opt-grid origin-grid">${orig}</div>
     ${gateBox}
-    ${st.origin==="followup"?`<div class="followup-list">${RECORDS.slice(0,8).map(r=>{const carry=r.agendas.filter(a=>a.status==="carry").length;return`<div class="followup-row${st.linkedRecord===r.id?" sel":""}" data-rec-pick="${r.id}"><span class="cand-chk"><svg viewBox="0 0 24 24"><path d="m5 12 5 5L20 6"/></svg></span><div><div class="followup-title">${r.title}</div><div class="followup-meta">${recordWhenText(r)} · 참석 ${r.who.length}명${r.wrap?"":" · 정리 전"}</div></div><span class="followup-badge">${r.wrap?(carry?`이월 ${carry}`:"완료"):"정리 전"}</span></div>`;}).join("")}${RECORDS.length>8?`<div class="followup-meta" style="padding:8px 12px">최근 8건 표시 — 이전 회의는 회의 기록에서 검색</div>`:""}</div>`:""}
+    ${st.origin==="followup"?`<div class="followup-pick">
+      <input class="inp" id="fuQ" placeholder="회의명 · 참석자 · 날짜로 검색" value="${attrEsc(st.followupQ||"")}" autocomplete="off">
+      <div class="followup-list" id="fuList">${followupRowsHtml()}</div>
+    </div>`:""}
     <div class="sec-t">내용${st.purposes.length?`<small style="float:right;display:flex;gap:5px">${purposePills(st.purposes)}</small>`:""}</div>
     <div class="f"><label>회의 제목</label><input class="f-line" id="mtitle0" value="${st.title||""}" placeholder="${st.agendas[0]?st.agendas[0].t:"예: 분기 실적 공유"}"></div>
     <div class="f"><label>다룰 내용${og?` — ${og.q}`:""}</label><textarea class="f-line agenda-input" id="magenda" placeholder="${ph}">${st.agendaDraft||""}</textarea></div>
@@ -3974,9 +3980,24 @@ function syncStage0Inputs(){
   const ag=document.getElementById("magenda");if(ag)st.agendaDraft=ag.value;
   const so=document.getElementById("msource");if(so)st.source=so.value;
 }
+/* 이전 회의 후속 목록 — 상한 없이 전체 기록. 검색(제목·참석자·날짜)으로 좁히고 내부 스크롤로 본다 */
+function followupRowsHtml(){
+  const q=(st.followupQ||"").trim().toLowerCase();
+  const hit=r=>!q||`${r.title} ${recordWhenText(r)} ${r.who.map(w=>w.id).join(" ")}`.toLowerCase().includes(q);
+  const list=RECORDS.filter(hit);
+  const rows=list.map(r=>{const carry=r.agendas.filter(a=>a.status==="carry").length;
+    return`<div class="followup-row${st.linkedRecord===r.id?" sel":""}" data-rec-pick="${r.id}"><span class="cand-chk"><svg viewBox="0 0 24 24"><path d="m5 12 5 5L20 6"/></svg></span><div><div class="followup-title">${r.title}</div><div class="followup-meta">${recordWhenText(r)} · 참석 ${r.who.length}명${r.wrap?"":" · 정리 전"}</div></div><span class="followup-badge">${r.wrap?(carry?`이월 ${carry}`:"완료"):"정리 전"}</span></div>`;}).join("");
+  const foot=`<div class="followup-meta followup-count">${q?`조회 ${list.length}건 / `:""}전체 ${RECORDS.length}건</div>`;
+  return(rows||`<div class="followup-meta" style="padding:12px">조건에 맞는 회의가 없어요 — 검색어를 바꿔보세요.</div>`)+foot;
+}
+function wireFollowupRows(){
+  document.querySelectorAll("[data-rec-pick]").forEach(b=>b.onclick=()=>{const rec=recOf(b.dataset.recPick);if(!rec)return;applyRecord(rec,true);refreshCreateStage();toast(`<strong>${rec.title}</strong> 후속 — 참석자 ${st.selected.size}명·형식 복사, 이월 안건 ${rec.agendas.filter(a=>a.status==="carry").length}건 반영`);});
+}
 function wireStage0(){
   document.querySelectorAll("[data-or]").forEach(c=>c.onclick=()=>{st.origin=c.dataset.or;const og=originOf(st.origin);if(og){st.defPurpose=og.pu;recomputePurposes();}refreshCreateStage();});
-  document.querySelectorAll("[data-rec-pick]").forEach(b=>b.onclick=()=>{const rec=recOf(b.dataset.recPick);if(!rec)return;applyRecord(rec,true);refreshCreateStage();toast(`<strong>${rec.title}</strong> 후속 — 참석자 ${st.selected.size}명·형식 복사, 이월 안건 ${rec.agendas.filter(a=>a.status==="carry").length}건 반영`);});
+  wireFollowupRows();
+  const fq=document.getElementById("fuQ");
+  if(fq)fq.oninput=()=>{st.followupQ=fq.value;const l=document.getElementById("fuList");if(l){l.innerHTML=followupRowsHtml();wireFollowupRows();}};  /* 재렌더 없이 목록만 갱신(포커스 유지) */
   const softRefresh=()=>{syncStage0Inputs();renderFoot();};
   const addAgenda=()=>{syncStage0Inputs();const n=addAgendaLines(st.agendaDraft);if(!n){toast("안건 내용을 입력해 주세요.");return;}st.agendaDraft="";refreshCreateStage();};
   const mt0=document.getElementById("mtitle0");if(mt0)mt0.oninput=softRefresh;
