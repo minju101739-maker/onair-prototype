@@ -420,7 +420,7 @@ svg{display:block;flex:none}
 .org-more b{color:var(--blue-d)}
 /* ── 연속성 요약 바 (모달 스텝 아래) ── */
 /* ── 만들기 모달 레이아웃 — 좌: 단계 콘텐츠 / 우: "만들어지는 회의" 요약(결과 영역) / 하단: 고정 CTA + inline validation ── */
-.modal-wrap.create{max-width:960px;height:min(940px,calc(100vh - 32px));border-radius:28px;box-shadow:0 32px 80px rgba(25,31,40,.28)}
+.modal-wrap.create{max-width:960px;height:min(820px,calc(100vh - 40px));border-radius:28px;box-shadow:0 32px 80px rgba(25,31,40,.28)}
 .modal-wrap.create .modal-bar{padding:24px 32px 10px}
 .modal-wrap.create .modal-bar h2{font-size:20px;font-weight:850;color:var(--ink);letter-spacing:0}
 .create-body{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr) auto;background:var(--panel)}
@@ -1249,7 +1249,7 @@ tr.opt-row .mat-cell .mf{opacity:.85}
 }
 
 /* ── 생성 모달 v2(레퍼런스 16 메인) — 블루 솔리드 헤더 · 섹션 폼 · 언더라인 인풋 · pill CTA · 도트 진행(15) · 칩 인풋(14) ── */
-.modal-wrap.create.v2{max-width:620px;width:min(620px,94vw);height:min(940px,calc(100vh - 32px));max-height:min(940px,calc(100vh - 32px));display:flex;flex-direction:column;border-radius:24px;overflow:hidden;background:#fff}
+.modal-wrap.create.v2{max-width:620px;width:min(620px,94vw);height:min(820px,calc(100vh - 40px));max-height:min(820px,calc(100vh - 40px));display:flex;flex-direction:column;border-radius:24px;overflow:hidden;background:#fff}
 .cm-head{flex:none;display:flex;align-items:center;background:var(--blue);padding:17px 18px 17px 28px}
 .cm-head h2{flex:1;font-size:17px;font-weight:850;color:#fff;letter-spacing:0}
 .cm-x{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;color:rgba(255,255,255,.86);font-size:19px;line-height:1;flex:none}
@@ -2343,6 +2343,8 @@ const ROOMS_DATA=[
 ];
 const roomLabel=r=>`${r.br} · ${r.fl} ${r.nm}`;
 const durH=m=>Math.max(1,Math.ceil(m/60));
+const DUR_OPTIONS=Array.from({length:16},(_,i)=>(i+1)*30);
+const durLabel=d=>d<60?`${d}분`:d%60===0?`${d/60}시간`:`${Math.floor(d/60)}시간 ${d%60}분`;
 /* 회의 시간대 [sh, sh+durH) 가 운영시간(9–18) 안이고 기존 예약과 겹치지 않는가 */
 const roomFree=(r,d,sh,m)=>{const eh=sh+durH(m),wd=d%7;return eh<=18&&!r.bk.some(b=>(b.once?b.d===d:b.d===wd)&&b.sh<eh&&b.eh>sh);};
 /* 정원 충족 + 시간 충돌 없음 회의실 (효율 배정: 정원 작은 방 우선) */
@@ -2971,7 +2973,7 @@ function recomputePurposes(){
   st.purposes=[...new Set(st.agendas.map(a=>a.pu))].sort((a,b)=>order.indexOf(a)-order.indexOf(b));
   if(!st.fmtTouched)st.format=fmtPolicy().def;
   const want=Math.max(purposeDur()||30,st.agendas.length*15);
-  st.dur=[30,60,90,120].find(d=>d>=want)||120;
+  st.dur=Math.min(480,Math.ceil(want/30)*30);
 }
 /* 여러 줄/붙여넣기 → 안건 목록. "1." "- " "• " 머리표 제거. 각 줄 유형 자동 태깅 */
 function addAgendaLines(raw){
@@ -4137,7 +4139,7 @@ function inviteOptionsHtml(raw){
   return sug.map(c=>`<button class="inv-opt" data-add="${c.id}">${av(c.id,26)}<span class="io-t"><b>${c.id} <span class="rk-pill">${c.rank}</span></b><span>${c.team} · ${c.duty}</span></span></button>`).join("");
 }
 function stage1(){
-  const durs=[30,60,90,120];const selArr=Array.from(st.selected);
+  const selArr=Array.from(st.selected);
   const reqN=getReq().length,optN=getOpt().length,fyiN=getFyi().length,totalN=reqN+optN+fyiN+1;
   const q=(st.query||"").trim();
   /* 자동완성 — 미선택 인원에서 이름/팀/직급/직무 매칭 상위 6명 */
@@ -4163,7 +4165,7 @@ function stage1(){
     ? `<div style="border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:14px">
         <div class="f2" style="margin-bottom:6px">
           <div class="f"><label>회의 제목</label><input class="f-line" id="mtitle" value="${st.title||""}" placeholder="${st.agendas[0]?st.agendas[0].t:"회의 제목"}"></div>
-          <div class="f"><label>소요 시간${recDur?` · 권장 ${recDur}분`:""}</label><div class="chip-group">${durs.map(d=>`<button class="chip${d===st.dur?" on":""}" data-d="${d}">${d<60?d+"분":d===60?"1시간":d/60+"시간"}</button>`).join("")}</div></div>
+          <div class="f"><label>소요 시간${recDur?` · 권장 ${recDur}분`:""}</label><select class="time-select" id="stgDur">${DUR_OPTIONS.map(d=>`<option value="${d}"${st.dur===d?" selected":""}>${durLabel(d)}</option>`).join("")}</select></div>
         </div>
         <div class="f2">
           <div class="f"><label>형식${fp.note?` · ${fp.note}`:""}</label><div class="chip-group">${fmts}</div></div>
@@ -4172,7 +4174,7 @@ function stage1(){
         ${hasPurpose("decide")?`<div class="f" style="margin-top:2px"><label>의사결정 방식</label><div class="chip-group">${decs}</div></div>`:""}
         <div style="text-align:right"><button class="link-btn" id="setDone">접기</button></div>
       </div>`
-    : `<div class="set-sum" id="setToggle" style="margin-top:14px;flex:none"><span class="set-lbl">설정</span><b>${autoTitle||"제목 자동"}</b><span class="fs-sep">·</span>${st.dur}분<span class="fs-sep">·</span>${FMT_LABEL[st.format]}${hasPurpose("decide")?`<span class="fs-sep">·</span>${DEC_LABEL[st.decision]}`:""}<span class="caret">펼치기 ▾</span></div>`;
+    : `<div class="set-sum" id="setToggle" style="margin-top:14px;flex:none"><span class="set-lbl">설정</span><b>${autoTitle||"제목 자동"}</b><span class="fs-sep">·</span>${durLabel(st.dur)}<span class="fs-sep">·</span>${FMT_LABEL[st.format]}${hasPurpose("decide")?`<span class="fs-sep">·</span>${DEC_LABEL[st.decision]}`:""}<span class="caret">펼치기 ▾</span></div>`;
   return`<div class="mc"><div class="mc-h"><h3>누가 참석하나요?</h3></div><div class="mc-b">
     <div class="sec-t" style="margin-top:2px">참석자 추가</div>
     <div class="inv-box">
@@ -4207,7 +4209,7 @@ function wireStage1(){
   document.querySelectorAll("[data-grade-sel]").forEach(s=>s.onchange=()=>{const id=s.dataset.gradeSel;st.roles[id]=roleForGrade(id,s.value);if(s.value==="fyi")approverSet().delete(id);if(st.scribe===id&&s.value==="fyi")st.scribe="나";refreshCreateStage();});
   document.querySelectorAll("[data-att-sel]").forEach(s=>s.onchange=()=>{st.attend[s.dataset.attSel]=s.value;refreshCreateStage();});
   document.querySelectorAll("[data-appr]").forEach(b=>b.onclick=()=>{const id=b.dataset.appr;if(gradeFor(id)==="fyi")return;const set=approverSet();set.has(id)?set.delete(id):set.add(id);refreshCreateStage();});
-  document.querySelectorAll(".chip[data-d]").forEach(c=>c.onclick=()=>{st.dur=+c.dataset.d;st.picked=null;st.room=null;refreshCreateStage();});
+  const sd=document.getElementById("stgDur");if(sd)sd.onchange=()=>{st.dur=+sd.value;st.picked=null;st.room=null;refreshCreateStage();};
   document.querySelectorAll(".chip[data-fmt]").forEach(c=>c.onclick=()=>{st.format=c.dataset.fmt;st.fmtTouched=true;st.picked=null;st.room=null;refreshCreateStage();});
   document.querySelectorAll(".chip[data-dec]").forEach(c=>c.onclick=()=>{st.decision=c.dataset.dec;refreshCreateStage();});
   const setT=document.getElementById("setToggle");if(setT)setT.onclick=()=>{st.showSettings=true;refreshCreateStage();};
@@ -4222,7 +4224,6 @@ function stage3(){
   const res=wr?{ranked:[],quality:"partial",total:0,feasible:0,comfortable:0}:chosenCandidates(3);
   const {ranked,quality,total,feasible,comfortable}=res;
   const need=needCount();
-  const durText=d=>d<60?`${d}분`:d===60?"1시간":`${d/60}시간`;
   const qNote = wr?`<div class="warn-box"><b>${wr}</b></div>`:quality==="good"?""
     : quality==="tight"
     ? `<div class="selection-note">참석 가능한 시간 중 우선순위가 가장 높은 후보입니다.</div>`
@@ -4246,7 +4247,7 @@ function stage3(){
       <div class="time-range-grid">
         <label class="time-field"><span>시작 시간</span><select class="time-select" id="winStart">${optionTimes(w.s,startFrom,(CAL_END-1)*60,30)}</select></label>
         <label class="time-field"><span>종료 시간</span><select class="time-select" id="winEnd">${optionTimes(w.e,endFrom,CAL_END*60,30)}</select></label>
-        <div class="time-field"><span>소요</span><select class="time-select" id="winDur">${Array.from({length:16},(_,i)=>(i+1)*30).map(d=>`<option value="${d}"${st.dur===d?" selected":""}>${durText(d)}</option>`).join("")}</select></div>
+        <div class="time-field"><span>소요</span><select class="time-select" id="winDur">${DUR_OPTIONS.map(d=>`<option value="${d}"${st.dur===d?" selected":""}>${durLabel(d)}</option>`).join("")}</select></div>
       </div>
     </div>
   </div>`;
@@ -5090,7 +5091,7 @@ function statListModal(){
       return`<button class="ml-row" data-ml-ev="${eventUid(e)}">
         <span class="ml-when${e.d===TODAY_IDX?" today":""}"><b>${DAYS_S[e.d]}</b><span>${DAYS_D[e.d]}</span></span>
         <span class="ml-tx"><b>${e.t}</b><span>${e.s}–${e.e}${info?` · ${info.r}`:""}</span></span>
-        ${e.k==="confirmed"?`<span class="ml-tag onair" title="ON AIR에서 조율·확정된 회의">ON AIR 확정</span>`:""}${chev}</button>`;
+        ${chev}</button>`;
     }).join(""):`<div class="ml-empty">이번 주에 잡힌 회의가 없어요.</div>`;
   }else if(st.statList==="respond"){
     title=`응답할 초대 ${s.respond.length}건`;
